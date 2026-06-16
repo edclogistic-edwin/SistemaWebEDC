@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const express = require("express");
@@ -44,6 +45,9 @@ const pool = new Pool({
     }
 });
 // LOGIN
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/views/index.html');
+});
 app.post("/api/login", async (req, res) => {
     try {
         const { correo, password } = req.body;
