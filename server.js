@@ -44,9 +44,8 @@ const pool = new Pool({
             false
     }
 });
-// LOGIN
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/views/index.html');
+app.get("/", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "index.html"));
 });
 app.post("/api/login", async (req, res) => {
     try {
