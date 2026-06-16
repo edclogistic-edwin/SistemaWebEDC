@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="css/style_login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Sistema E&DC</h1>
+            <h2>Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="correo">Correo</label>
+                    <input type="email" id="correo" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Ingresar</button>
+            </form>
+            <div id="error" class="error" style="display: none;"></div>
+        </div>
+    </div>
+   
+    <script>
+const loginForm = document.getElementById('loginForm');
+const errorDiv = document.getElementById('error');
+
+loginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+
+    const correo = document.getElementById('correo').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!correo || !password) {
+        errorDiv.textContent = 'Ingresa correo y contraseña.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                correo,
+                password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            errorDiv.textContent = data.message;
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        localStorage.setItem(
+            'usuarioNombre',
+            data.usuario.nombre
+        );
+
+        localStorage.setItem(
+            'usuarioCorreo',
+            data.usuario.correo
+        );
+
+        localStorage.setItem(
+            'usuarioRol',
+            data.usuario.rol
+        );
+
+        window.location.href =
+            './views/dashboard.html';
+
+    } catch (err) {
+        console.error(err);
+
+        errorDiv.textContent =
+            'Error de conexión';
+
+        errorDiv.style.display =
+            'block';
+    }
+});
+</script>
+</body>
+</html>

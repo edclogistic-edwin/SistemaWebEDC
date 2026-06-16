@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tractos - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/style_tracto.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+
+            <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Lista de Tractos</h1>
+
+        <!-- B�sSQUEDA -->
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center;">
+            <input type="text" id="buscador" placeholder="Buscar por Placa o Marca..."
+                style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif;">
+            <button id="btnBuscar"
+                style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;">Buscar</button>
+            <button id="btnRefrescar"
+                style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red);  color: white; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;">Refrescar</button>
+        </div>
+
+        <a href="agregar_tracto.html">
+            <button class="btn-agregar" style="border: none; background: transparent; cursor: pointer;">Agregar
+                Tracto</button>
+        </a>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Foto</th>
+                        <th>Placa</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Año</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaTractos">
+                    <tr>
+                        <td colspan="8">Cargando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="../js/dropdown.js"></script>
+    <script>
+        let todosLosTractos = [];
+
+        // ==========================
+        // CARGAR TRACTOS (NEON)
+        // ==========================
+        async function cargarTractos() {
+            const tbody = document.getElementById('tablaTractos');
+
+            try {
+                const res = await fetch('http://localhost:3000/api/tractos');
+                const data = await res.json();
+
+                todosLosTractos = data;
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8">No hay tractos registrados</td></tr>';
+                    return;
+                }
+
+                mostrarTractos(data);
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: red;">Error: ' + error.message + '</td></tr>';
+            }
+        }
+
+        // ==========================
+        // MOSTRAR TRACTOS
+        // ==========================
+        function mostrarTractos(tractos) {
+            const tbody = document.getElementById('tablaTractos');
+
+            if (tractos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8">No se encontraron tractos</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = tractos.map(t => `
+            <tr style="${!t.estado ? 'background: #f5f5f5; color: #666;' : ''}">
+                <td>${t.id_tracto}</td>
+                <td>
+                    ${t.foto_url ?
+                    `<img src="${t.foto_url}" alt="Foto" style="width: 60px; height: 40px; object-fit: cover; border-radius: 4px;">`
+                    : 'Sin foto'}
+                </td>
+                <td>${t.placa}</td>
+                <td>${t.marca || '-'}</td>
+                <td>${t.modelo || '-'}</td>
+                <td>${t.anio || '-'}</td>
+                <td>
+                    <span 
+                        style="color:${t.estado ? 'green' : 'red'}; cursor: pointer;" 
+                        onclick="toggleEstado(${t.id_tracto}, ${t.estado})">
+                        ${t.estado ? 'Activo' : 'Inactivo'}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <a href="editar_tracto.html?id=${t.id_tracto}" style="color: #0ea5e9; text-decoration: none; font-weight: 600; margin-right: 8px;">Editar</a>
+                </td>
+            </tr>
+        `).join('');
+        }
+
+        // ==========================
+        // TOGGLE ESTADO
+        // ==========================
+        async function toggleEstado(id, estadoActual) {
+            try {
+                await fetch(`http://localhost:3000/api/tractos/${id}/estado`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ estado: !estadoActual })
+                });
+                cargarTractos();
+            } catch (err) {
+                console.error("Error:", err);
+                alert("Error al cambiar estado");
+            }
+        }
+
+        // ==========================
+        // BUSCAR
+        // ==========================
+        function buscarTractos() {
+            const termino = document.getElementById('buscador').value.toLowerCase().trim();
+
+            if (termino === '') {
+                mostrarTractos(todosLosTractos);
+                return;
+            }
+
+            const filtrados = todosLosTractos.filter(t =>
+                (t.placa && t.placa.toLowerCase().includes(termino)) ||
+                (t.marca && t.marca.toLowerCase().includes(termino)) ||
+                (t.modelo && t.modelo.toLowerCase().includes(termino))
+            );
+
+            mostrarTractos(filtrados);
+        }
+
+        // ==========================
+        // EVENTOS
+        // ==========================
+        document.getElementById('btnBuscar').addEventListener('click', buscarTractos);
+
+        document.getElementById('buscador').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                buscarTractos();
+            }
+        });
+
+        document.getElementById('btnRefrescar').addEventListener('click', () => {
+            document.getElementById('buscador').value = '';
+            mostrarTractos(todosLosTractos);
+        });
+
+        cargarTractos();
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = '../index.html';
+        });
+
+        document.getElementById('perfilBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'Vista_Perfil.html';
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Servicio - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/Vista_Servicio.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><img src="../img/logo.png.png" alt="Logo" class="nav-logo"></div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+           <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+            <a href="Vista_Perfil.html">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Editar Servicio</h1>
+        <div id="mensaje" style="display: none; margin-top: 16px; padding: 12px; border-radius: 6px;"></div>
+
+        <form id="formEditar">
+            <div class="form-group">
+                <label>Fecha *</label>
+                <input type="date" id="fecha_servicio" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>Hora *</label>
+                <input type="time" id="hora" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>CHOFER / CONDUCTOR *</label>
+                <select id="id_conductor" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+                    <option value="">-- Cargando conductores... --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Placa Carreta *</label>
+                <select id="id_carreta" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+                    <option value="">-- Cargando carretas... --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Contenedor *</label>
+                <input type="text" id="contenedor" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>Agencia *</label>
+                <input type="text" id="agencia" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>Cliente *</label>
+                <input type="text" id="cliente" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>Contacto *</label>
+                <input type="text" id="contacto" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>Tipo Contenedor (1X20-1X40) *</label>
+                <label style="display: inline-flex; gap: 8px; margin-right: 16px;">
+                    <input type="radio" name="tipo_contenedor" value="1X20" required> 1X20
+                </label>
+                <label style="display: inline-flex; gap: 8px;">
+                    <input type="radio" name="tipo_contenedor" value="1X40" required> 1X40
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>Tipo de Carga (IMO-GENERAL) *</label>
+                <label style="display: inline-flex; gap: 8px; margin-right: 16px;">
+                    <input type="radio" name="tipo_carga" value="IMO" required> IMO
+                </label>
+                <label style="display: inline-flex; gap: 8px;">
+                    <input type="radio" name="tipo_carga" value="GENERAL" required> GENERAL
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>Factura</label>
+                <input type="text" id="factura" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>Punto Salida *</label>
+                <select id="punto_salida" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="APM">APM</option>
+                    <option value="RANSA SAN AGUSTIN">RANSA SAN AGUSTIN</option>
+                    <option value="RANZA BARON">RANZA BARON</option>
+                    <option value="FARBOLINE">FARBOLINE</option>
+                    <option value="UNIMAR">UNIMAR</option>
+                    <option value="FAMESA">FAMESA</option>
+                    <option value="DPW">DPW</option>
+                    <option value="LICSA">LICSA</option>
+                    <option value="GAMBETA 1">GAMBETA 1</option>
+                    <option value="GAMBETA 2">GAMBETA 2</option>
+                    <option value="DEMARES 1">DEMARES 1</option>
+                    <option value="DEMARES 2">DEMARES 2</option>
+                    <option value="IMUPESA">IMUPESA</option>
+                    <option value="PUERTO CHANCAY">PUERTO CHANCAY</option>
+                    <option value="NEW AGENCIA">NEW AGENCIA</option>
+                    <option value="RSF">RSF</option>
+                    <option value="CONTRANS">CONTRANS</option>
+                    <option value="TPP 1">TPP 1</option>
+                    <option value="TPP 2">TPP 2</option>
+                    <option value="TPP 3 CARRILLO">TPP 3 CARRILLO</option>
+                    <option value="INFINIO">INFINIO</option>
+                    <option value="CHEMDRADE">CHEMDRADE</option>
+                    <option value="GRAU">GRAU</option>
+                    <option value="ALFONSAC">ALFONSAC</option>
+                    <option value="VILLAS DE OQUENDO">VILLAS DE OQUENDO</option>
+                    <option value="ALCONSA">ALCONSA</option>
+                    <option value="CARGA SUELTA CLIENTE">CARGA SUELTA CLIENTE</option>
+                    <option value="IMPALA">IMPALA</option>
+                    <option value="LOGISTICS 2">LOGISTICS 2</option>
+                    <option value="TPP">TPP</option>
+                    <option value="GAMBETTA �-">GAMBETTA �-</option>
+                    <option value="NOA">NOA</option>
+                    <option value="DINET">DINET</option>
+                    <option value="DPW LOGISTICS ARGENTINA">DPW LOGISTICS ARGENTINA</option>
+                    <option value="SAK DEPORT">SAK DEPORT</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Punto Llegada</label>
+                <input type="text" id="punto_llegada" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>N° Guía Remisión</label>
+                <input type="text" id="numero_guia_remision" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>N° Guía Transporte</label>
+                <input type="text" id="numero_guia_transporte" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>Vigencia</label>
+                <input type="date" id="vigencia" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>Fecha Entrega</label>
+                <input type="date" id="fecha_entrega" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div class="form-group">
+                <label>Observaciones 1 *</label>
+                <label style="display: inline-flex; gap: 8px; margin-right: 12px;">
+                    <input type="radio" name="observacion_1" value="CABAÑA" required> CABAÑA
+                </label>
+                <label style="display: inline-flex; gap: 8px; margin-right: 12px;">
+                    <input type="radio" name="observacion_1" value="COCHERA" required> COCHERA
+                </label>
+                <label style="display: inline-flex; gap: 8px; margin-right: 12px;">
+                    <input type="radio" name="observacion_1" value="MAS ADENTRO" required> MAS ADENTRO
+                </label>
+                <label style="display: inline-flex; gap: 8px; margin-right: 12px;">
+                    <input type="radio" name="observacion_1" value="SSEE" required> SSEE
+                </label>
+                <label style="display: inline-flex; gap: 8px;">
+                    <input type="radio" name="observacion_1" value="CARGA SUELTA" required> CARGA SUELTA
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>Observaciones 2</label>
+                <textarea id="observacion_2" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; min-height: 100px; resize: vertical;"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Entrega Contenedor</label>
+                <select id="entrega_contenedor" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="GAMBETA 2">GAMBETA 2</option>
+                    <option value="RANSA SAN AGUSTIN">RANSA SAN AGUSTIN</option>
+                    <option value="RANZA BARON">RANZA BARON</option>
+                    <option value="FARBOLINE">FARBOLINE</option>
+                    <option value="UNIMAR">UNIMAR</option>
+                    <option value="FAMESA">FAMESA</option>
+                    <option value="APM">APM</option>
+                    <option value="DPW">DPW</option>
+                    <option value="LICSA">LICSA</option>
+                    <option value="GAMBETA 1">GAMBETA 1</option>
+                    <option value="DEMARES 1">DEMARES 1</option>
+                    <option value="DEMARES 2">DEMARES 2</option>
+                    <option value="IMUPESA">IMUPESA</option>
+                    <option value="PUERTO CHANCAY">PUERTO CHANCAY</option>
+                    <option value="NEW AGENCIA">NEW AGENCIA</option>
+                    <option value="RSF">RSF</option>
+                    <option value="CONTRANS">CONTRANS</option>
+                    <option value="TPP 1">TPP 1</option>
+                    <option value="TPP 2">TPP 2</option>
+                    <option value="TPP 3 CARRILLO">TPP 3 CARRILLO</option>
+                    <option value="INFINIO">INFINIO</option>
+                    <option value="CHEMDRADE">CHEMDRADE</option>
+                    <option value="GRAU">GRAU</option>
+                    <option value="ALFONSAC">ALFONSAC</option>
+                    <option value="VILLAS DE OQUENDO">VILLAS DE OQUENDO</option>
+                    <option value="ALCONSA">ALCONSA</option>
+                    <option value="CARGA SUELTA CLIENTE">CARGA SUELTA CLIENTE</option>
+                    <option value="IMPALA">IMPALA</option>
+                    <option value="LOGISTICS 2">LOGISTICS 2</option>
+                    <option value="TPP">TPP</option>
+                    <option value="GAMBETTA 3">GAMBETTA 3</option>
+                    <option value="NOA">NOA</option>
+                    <option value="DINET">DINET</option>
+                    <option value="DPW LOGISTICS ARGENTINA">DPW LOGISTICS ARGENTINA</option>
+                    <option value="SAK DEPORT">SAK DEPORT</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-primary" style="padding: 12px 32px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px;">Guardar Cambios</button>
+            <a href="Vista_Servicio.html" style="padding: 12px 32px; border: none; border-radius: 8px; background: #6c757d; color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; text-decoration: none; margin-left: 12px;">Cancelar</a>
+        </form>
+
+        <a href="Vista_Servicio.html" style="display: inline-block; margin-top: 24px; color: var(--primary-red); text-decoration: none; font-weight: 600;">�?� Volver a la lista de servicios</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const idServicio = urlParams.get('id');
+
+        if (!idServicio) {
+            alert('ID de servicio no proporcionado');
+            window.location.href = 'Vista_Servicio.html';
+        }
+
+        const form = document.getElementById('formEditar');
+        const mensaje = document.getElementById('mensaje');
+
+        // Cargar conductores y carretas PRIMERO
+        async function cargarSelects() {
+            console.log('�Y"� CARGANDO SELECTS...');
+            const conductorSelect = document.getElementById('id_conductor');
+            const carretaSelect = document.getElementById('id_carreta');
+
+            const { data: conductores, error: e1 } = await supabaseClient.from('conductor').select('id_conductor, nombres, apellidos').filter('estado', 'eq', true);
+            console.log('CONDUCTORES:', conductores, 'ERROR:', e1);
+            
+            if (e1) {
+                console.error('ERROR CONDUCTORES:', e1);
+                conductorSelect.innerHTML = '<option value="">ERROR: ' + e1.message + '</option>';
+            } else if (!conductores || conductores.length === 0) {
+                console.warn('NO HAY CONDUCTORES');
+                conductorSelect.innerHTML = '<option value="">NO HAY CONDUCTORES</option>';
+            } else {
+                conductorSelect.innerHTML = '<option value="">-- Seleccionar CHOFER --</option>';
+                conductores.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id_conductor;
+                    opt.textContent = c.nombres + ' ' + c.apellidos;
+                    conductorSelect.appendChild(opt);
+                });
+            }
+
+            const { data: carretas, error: e2 } = await supabaseClient.from('carreta').select('id_carreta, placa').filter('estado', 'eq', true);
+            console.log('CARRETAS:', carretas, 'ERROR:', e2);
+            
+            if (e2) {
+                console.error('ERROR CARRETAS:', e2);
+                carretaSelect.innerHTML = '<option value="">ERROR: ' + e2.message + '</option>';
+            } else if (!carretas || carretas.length === 0) {
+                console.warn('NO HAY CARRETAS');
+                carretaSelect.innerHTML = '<option value="">NO HAY CARRETAS</option>';
+            } else {
+                carretaSelect.innerHTML = '<option value="">-- Seleccionar Carreta --</option>';
+                carretas.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id_carreta;
+                    opt.textContent = c.placa;
+                    carretaSelect.appendChild(opt);
+                });
+            }
+        }
+
+        // Cargar servicio y LLENAR formulario
+        async function cargarServicio() {
+            console.log('�Y"� CARGANDO SERVICIO ID:', idServicio);
+            
+            const { data, error } = await supabaseClient.from('servicio').select('*').eq('id_servicio', idServicio).single();
+            console.log('SERVICIO:', data, 'ERROR:', error);
+
+            if (error) {
+                console.error('ERROR CARGANDO SERVICIO:', error);
+                mostrarMensaje('Error: ' + error.message, 'error');
+                return;
+            }
+
+            // CARGAR SELECTS PRIMERO
+            await cargarSelects();
+
+            console.log('�Y"� LLENANDO FORMULARIO...');
+
+            document.getElementById('fecha_servicio').value = data.fecha_servicio || '';
+            document.getElementById('hora').value = data.hora || '';
+            document.getElementById('id_conductor').value = data.id_conductor || '';
+            document.getElementById('id_carreta').value = data.id_carreta || '';
+            document.getElementById('contenedor').value = data.contenedor || '';
+            document.getElementById('agencia').value = data.agencia || '';
+            document.getElementById('cliente').value = data.cliente || '';
+            document.getElementById('contacto').value = data.contacto || '';
+            document.getElementById('factura').value = data.factura || '';
+            document.getElementById('punto_salida').value = data.punto_salida || '';
+            document.getElementById('punto_llegada').value = data.punto_llegada || '';
+            document.getElementById('numero_guia_remision').value = data.numero_guia_remision || '';
+            document.getElementById('numero_guia_transporte').value = data.numero_guia_transporte || '';
+            document.getElementById('vigencia').value = data.vigencia || '';
+            document.getElementById('fecha_entrega').value = data.fecha_entrega || '';
+            document.getElementById('entrega_contenedor').value = data.entrega_contenedor || '';
+            document.getElementById('observacion_2').value = data.observacion_2 || '';
+
+            const radioTipoContenedor = document.querySelector('input[name="tipo_contenedor"][value="' + data.tipo_contenedor + '"]');
+            if (radioTipoContenedor) { radioTipoContenedor.checked = true; console.log('TIPO_CONTENEDOR:', data.tipo_contenedor); }
+
+            const radioTipoCarga = document.querySelector('input[name="tipo_carga"][value="' + data.tipo_carga + '"]');
+            if (radioTipoCarga) { radioTipoCarga.checked = true; console.log('TIPO_CARGA:', data.tipo_carga); }
+
+            const radioObservacion1 = document.querySelector('input[name="observacion_1"][value="' + data.observacion_1 + '"]');
+            if (radioObservacion1) { radioObservacion1.checked = true; console.log('OBSERVACION_1:', data.observacion_1); }
+
+            console.log('�o. FORMULARIO LLENADO!');
+        }
+
+        function mostrarMensaje(texto, tipo) {
+            mensaje.textContent = texto;
+            mensaje.style.display = 'block';
+            mensaje.style.background = tipo === 'error' ? '#fee2e2' : '#d1fae5';
+            mensaje.style.color = tipo === 'error' ? '#dc2626' : '#059669';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            mensaje.style.display = 'none';
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+
+            try {
+                const servicio = {
+                    fecha_servicio: document.getElementById('fecha_servicio').value,
+                    hora: document.getElementById('hora').value,
+                    id_conductor: parseInt(document.getElementById('id_conductor').value),
+                    id_carreta: parseInt(document.getElementById('id_carreta').value),
+                    contenedor: document.getElementById('contenedor').value.trim(),
+                    agencia: document.getElementById('agencia').value.trim(),
+                    cliente: document.getElementById('cliente').value.trim(),
+                    contacto: document.getElementById('contacto').value.trim(),
+                    tipo_contenedor: document.querySelector('input[name="tipo_contenedor"]:checked').value,
+                    tipo_carga: document.querySelector('input[name="tipo_carga"]:checked').value,
+                    factura: document.getElementById('factura').value.trim(),
+                    punto_salida: document.getElementById('punto_salida').value,
+                    punto_llegada: document.getElementById('punto_llegada').value.trim(),
+                    numero_guia_remision: document.getElementById('numero_guia_remision').value.trim(),
+                    numero_guia_transporte: document.getElementById('numero_guia_transporte').value.trim(),
+                    vigencia: document.getElementById('vigencia').value,
+                    fecha_entrega: document.getElementById('fecha_entrega').value,
+                    entrega_contenedor: document.getElementById('entrega_contenedor').value,
+                    observacion_1: document.querySelector('input[name="observacion_1"]:checked').value,
+                    observacion_2: document.getElementById('observacion_2').value.trim()
+                };
+
+                console.log('�Y"� UPDATE:', servicio);
+
+                const { error: updateError } = await supabaseClient.from('servicio').update(servicio).eq('id_servicio', idServicio);
+                console.log('RESULTADO:', updateError);
+
+                if (updateError) {
+                    throw new Error('Error: ' + updateError.message);
+                }
+
+                mostrarMensaje('Guardado! Redirigiendo...', 'success');
+                setTimeout(() => { window.location.href = 'Vista_Servicio.html'; }, 1500);
+
+            } catch (err) {
+                mostrarMensaje('Error: ' + err.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Guardar Cambios';
+            }
+        });
+
+        // CARGAR AL INICIO
+        cargarServicio();
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+</html>

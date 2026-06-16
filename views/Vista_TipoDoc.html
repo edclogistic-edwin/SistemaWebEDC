@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipos de Documento - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/style_tipodoc.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+
+            <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Lista de Tipos de Documento</h1>
+
+        <!-- B�sSQUEDA -->
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center;">
+            <input type="text" id="buscador" placeholder="Buscar por Nombre o Categoría..."
+                style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif;">
+            <button id="btnBuscar"
+                style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;">Buscar</button>
+            <button id="btnRefrescar"
+                style="padding: 12px 24px; border: none; border-radius: 8px; background:var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;">Refrescar</button>
+        </div>
+
+        <a href="agregar_tipodoc.html">
+            <button class="btn-agregar" style="border: none; background: transparent; cursor: pointer;">Agregar Tipo de
+                Documento</button>
+        </a>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Requiere Vencimiento</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaTipoDoc">
+                    <tr>
+                        <td colspan="6">Cargando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINACI�"N AGREGADA -->
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+            <div id="infoPaginacion" style="font-size: 14px; color: #666;">
+                Mostrando 0 de 0 registros
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="btnAnterior" onclick="paginarAnterior()"
+                    style="padding: 8px 16px; background: var(--primary-red); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                    Anterior
+                </button>
+                <span id="numeroPagina" style="padding: 8px 16px; font-weight: 600; font-size: 14px;">
+                    Página 1
+                </span>
+                <button id="btnSiguiente" onclick="paginarSiguiente()"
+                    style="padding: 8px 16px; background: var(--primary-red); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                    Siguiente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/dropdown.js"></script>
+
+    <script>
+
+        let todosLosTiposDoc = [];
+        let paginaActual = 1;
+
+        const registrosPorPagina = 10;
+
+        let tiposDocFiltrados = [];
+
+
+        // =====================
+        // CARGAR TIPOS DOC
+        // =====================
+        async function
+            cargarTiposDoc() {
+
+            const tbody =
+                document.getElementById(
+                    'tablaTipoDoc'
+                );
+
+            try {
+
+                const response =
+                    await fetch(
+                        'http://localhost:3000/api/tipos-documento'
+                    );
+
+                const data =
+                    await response.json();
+
+                todosLosTiposDoc =
+                    data;
+
+                tiposDocFiltrados =
+                    data;
+
+                if (data.length === 0) {
+
+                    tbody.innerHTML =
+                        `
+                <tr>
+                    <td colspan="6">
+                        No hay tipos
+                        de documento
+                    </td>
+                </tr>
+                `;
+
+                    actualizarInfoPaginacion();
+                    return;
+                }
+
+                mostrarTiposDocPagina();
+
+            } catch (error) {
+
+                tbody.innerHTML =
+                    `
+            <tr>
+                <td colspan="6"
+                    style="
+                    color:red;
+                    text-align:center;
+                    padding:40px;
+                    "
+                >
+                    Error:
+                    ${error.message}
+                </td>
+            </tr>
+            `;
+            }
+        }
+
+
+        // =====================
+        // MOSTRAR TABLA
+        // =====================
+        function
+            mostrarTiposDocPagina() {
+
+            const tbody =
+                document.getElementById(
+                    'tablaTipoDoc'
+                );
+
+            const inicio =
+                (paginaActual - 1)
+                * registrosPorPagina;
+
+            const tiposPagina =
+                tiposDocFiltrados.slice(
+                    inicio,
+                    inicio +
+                    registrosPorPagina
+                );
+
+            if (
+                tiposPagina.length === 0
+            ) {
+
+                tbody.innerHTML =
+                    `
+            <tr>
+                <td colspan="6">
+                    No se encontraron
+                    registros
+                </td>
+            </tr>
+            `;
+
+                actualizarInfoPaginacion();
+                return;
+            }
+
+            tbody.innerHTML =
+                tiposPagina.map(
+                    t => `
+            <tr style="
+                ${!t.estado
+                            ? 'background:#f5f5f5;color:#666;'
+                            : ''}
+            ">
+
+                <td>
+                    ${t.id_tipo_documento}
+                </td>
+
+                <td>
+                    ${t.nombre}
+                </td>
+
+                <td>
+                    ${t.categoria}
+                </td>
+
+                <td>
+                    ${t.requiere_vencimiento
+                            ? 'Sí'
+                            : 'No'}
+                </td>
+
+                <td>
+
+                    <button
+                        onclick="
+                        toggleEstadoTipoDoc(
+                        ${t.id_tipo_documento},
+                        ${t.estado}
+                        )"
+                        style="
+                        padding:6px 12px;
+                        border:none;
+                        border-radius:6px;
+                        background:
+                        ${t.estado
+                            ? '#059669'
+                            : '#dc2626'};
+                        color:white;
+                        cursor:pointer;
+                        "
+                    >
+                        ${t.estado
+                            ? 'Activo'
+                            : 'Inactivo'}
+                    </button>
+
+                </td>
+
+                <td>
+
+                    <a
+                        href="
+                        editar_tipodoc.html?id=
+                        ${t.id_tipo_documento}
+                        "
+                    >
+                        Editar
+                    </a>
+
+                </td>
+
+            </tr>
+            `
+                ).join('');
+
+            actualizarInfoPaginacion();
+        }
+
+
+        // =====================
+        // CAMBIAR ESTADO
+        // =====================
+        async function
+            toggleEstadoTipoDoc(
+                id,
+                estadoActual
+            ) {
+
+            try {
+
+                const response =
+                    await fetch(
+                        `http://localhost:3000/api/tipos-documento/${id}/estado`,
+                        {
+                            method: 'PUT',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    estado:
+                                        !estadoActual
+                                })
+                        }
+                    );
+
+                if (
+                    response.ok
+                ) {
+
+                    cargarTiposDoc();
+                }
+
+            } catch (error) {
+
+                alert(
+                    error.message
+                );
+            }
+        }
+
+
+        // =====================
+        // BUSCAR
+        // =====================
+        function
+            buscarTiposDoc() {
+
+            const termino =
+                document
+                    .getElementById(
+                        'buscador'
+                    )
+                    .value
+                    .toLowerCase()
+                    .trim();
+
+            if (
+                termino === ''
+            ) {
+
+                tiposDocFiltrados =
+                    todosLosTiposDoc;
+
+            } else {
+
+                tiposDocFiltrados =
+                    todosLosTiposDoc.filter(
+                        t =>
+
+                            t.nombre
+                                ?.toLowerCase()
+                                .includes(
+                                    termino
+                                )
+
+                            ||
+
+                            t.categoria
+                                ?.toLowerCase()
+                                .includes(
+                                    termino
+                                )
+                    );
+            }
+
+            paginaActual = 1;
+
+            mostrarTiposDocPagina();
+        }
+
+
+        // =====================
+        // PAGINACION
+        // =====================
+        function
+            actualizarInfoPaginacion() {
+
+            const total =
+                tiposDocFiltrados.length;
+
+            const desde =
+                total === 0
+                    ? 0
+                    : (
+                        (
+                            paginaActual - 1
+                        )
+                        * registrosPorPagina
+                    ) + 1;
+
+            const hasta =
+                Math.min(
+                    paginaActual
+                    * registrosPorPagina,
+                    total
+                );
+
+            const totalPaginas =
+                Math.ceil(
+                    total /
+                    registrosPorPagina
+                );
+
+            document
+                .getElementById(
+                    'infoPaginacion'
+                )
+                .textContent =
+                `Mostrando
+        ${desde}
+        -
+        ${hasta}
+        de
+        ${total}`;
+
+            document
+                .getElementById(
+                    'numeroPagina'
+                )
+                .textContent =
+                `Página
+        ${paginaActual}
+        de
+        ${Math.max(
+                    totalPaginas,
+                    1
+                )}`;
+
+            document
+                .getElementById(
+                    'btnAnterior'
+                ).disabled =
+                paginaActual === 1;
+
+            document
+                .getElementById(
+                    'btnSiguiente'
+                ).disabled =
+                paginaActual
+                >= totalPaginas;
+        }
+
+
+        function
+            paginarAnterior() {
+
+            if (
+                paginaActual > 1
+            ) {
+
+                paginaActual--;
+
+                mostrarTiposDocPagina();
+            }
+        }
+
+        function
+            paginarSiguiente() {
+
+            const totalPaginas =
+                Math.ceil(
+                    tiposDocFiltrados.length
+                    /
+                    registrosPorPagina
+                );
+
+            if (
+                paginaActual
+                <
+                totalPaginas
+            ) {
+
+                paginaActual++;
+
+                mostrarTiposDocPagina();
+            }
+        }
+
+
+        // =====================
+        // EVENTOS
+        // =====================
+        document
+            .getElementById(
+                'btnBuscar'
+            )
+            .addEventListener(
+                'click',
+                buscarTiposDoc
+            );
+
+        document
+            .getElementById(
+                'buscador'
+            )
+            .addEventListener(
+                'keypress',
+                e => {
+
+                    if (
+                        e.key === 'Enter'
+                    ) {
+
+                        buscarTiposDoc();
+                    }
+                }
+            );
+
+        document
+            .getElementById(
+                'btnRefrescar'
+            )
+            .addEventListener(
+                'click',
+                () => {
+
+                    document
+                        .getElementById(
+                            'buscador'
+                        ).value = '';
+
+                    tiposDocFiltrados =
+                        todosLosTiposDoc;
+
+                    paginaActual = 1;
+
+                    mostrarTiposDocPagina();
+                }
+            );
+
+
+        // INICIAR
+        cargarTiposDoc();
+
+    </script>
+</body>
+
+</html>

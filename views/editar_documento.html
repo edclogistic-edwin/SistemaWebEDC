@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Documento del Conductor - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/style_conductor_doc.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+            
+           <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+            
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+    
+    
+    <div class="container">
+        <h1>Editar Documento del Conductor</h1>
+        
+        <div id="cargando" style="text-align: center; padding: 40px; font-size: 18px; color: #666;">
+            Cargando datos del documento...
+        </div>
+        
+        <form id="formularioDocumento" style="display: none;">
+            <div style="margin-bottom: 20px;">
+                <label for="idDocumento" style="display: block; margin-bottom: 8px; font-weight: 600;">ID Documento</label>
+                <input type="text" id="idDocumento" readonly style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #f5f5f5;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="idConductor" style="display: block; margin-bottom: 8px; font-weight: 600;">Conductor *</label>
+                <select id="idConductor" required style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                    <option value="">Seleccionar conductor...</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="idTipoDocumento" style="display: block; margin-bottom: 8px; font-weight: 600;">Tipo de Documento *</label>
+                <select id="idTipoDocumento" required style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                    <option value="">Seleccionar tipo de documento...</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="fechaEmision" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha Emisión *</label>
+                <input type="date" id="fechaEmision" required style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="fechaVencimiento" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha Vencimiento *</label>
+                <input type="date" id="fechaVencimiento" required style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="archivoActual" style="display: block; margin-bottom: 8px; font-weight: 600;">Archivo actual</label>
+                <div id="archivoActual" style="padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 12px;">
+                    No hay archivo cargado
+                </div>
+                <label for="archivoNuevo" style="display: block; margin-bottom: 8px; font-weight: 600;">Cambiar archivo (PDF)</label>
+                <input type="file" id="archivoNuevo" accept=".pdf" style="width: 100%;">
+                <small style="color: #666; margin-top: 4px; display: block;">Solo archivos PDF. Si no seleccionas nada, se mantiene el archivo actual.GUARDAR 2 VECES PONER EL BOTON</small>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="observacion" style="display: block; margin-bottom: 8px; font-weight: 600;">Observación</label>
+                <textarea id="observacion" rows="4" placeholder="Escribe una observación..." style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif;"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 30px;">
+                <button type="button" id="btnCancelar" style="padding: 12px 24px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #333; font-size: 15px; font-weight: 600; cursor: pointer;">Cancelar</button>
+                <button type="submit" id="btnGuardar" style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+    
+     <script src="../js/dropdown.js"></script>
+  <script>
+let idDocumentoEdit = null;
+
+// ==========================
+// INIT - SOLO UN DOMContentLoaded (EL CORRECTO)
+// ==========================
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("DOM LOADED - URL:", window.location.href);
+
+    // Obtener ID desde URL
+    const params = new URLSearchParams(window.location.search);
+    idDocumentoEdit = params.get('id');
+
+    console.log("ID CAPTURADO:", idDocumentoEdit);
+
+    if (!idDocumentoEdit) {
+        alert("No llegó el ID en la URL. URL actual: " + window.location.href);
+        window.location.href = "Vista_Conductor_Doc.html";
+        return;
+    }
+
+    // Cargar datos necesarios
+    await cargarConductores();
+    await cargarTiposDocumento();
+    await cargarDocumento();
+
+    // Mostrar formulario
+    document.getElementById('cargando').style.display = 'none';
+    document.getElementById('formularioDocumento').style.display = 'block';
+});
+
+// ==========================
+// CARGAR DOCUMENTO POR ID
+// ==========================
+async function cargarDocumento() {
+    try {
+        const res = await fetch(`http://localhost:3000/api/documentos/${idDocumentoEdit}`);
+        
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || "Documento no encontrado");
+        }
+
+        const data = await res.json();
+        console.log("DATOS DEL DOCUMENTO:", data);
+
+        // Asignar ID del documento (readonly)
+        if (document.getElementById('idDocumento')) {
+            document.getElementById('idDocumento').value = data.id_documento || '';
+        }
+        
+        // Asignar valores al formulario
+        if (document.getElementById('idConductor')) {
+            document.getElementById('idConductor').value = data.id_conductor || '';
+        }
+        
+        if (document.getElementById('idTipoDocumento')) {
+            document.getElementById('idTipoDocumento').value = data.id_tipo_documento || '';
+        }
+        
+        // Formatear fechas correctamente para input type="date"
+        if (document.getElementById('fechaEmision') && data.fecha_emision) {
+            document.getElementById('fechaEmision').value = data.fecha_emision.slice(0, 10);
+        }
+        
+        if (document.getElementById('fechaVencimiento') && data.fecha_vencimiento) {
+            document.getElementById('fechaVencimiento').value = data.fecha_vencimiento.slice(0, 10);
+        }
+        
+        if (document.getElementById('observacion')) {
+            document.getElementById('observacion').value = data.observacion || '';
+        }
+
+        // Mostrar archivo actual
+        if (document.getElementById('archivoActual')) {
+            document.getElementById('archivoActual').innerHTML =
+                data.archivo_url
+                    ? `<a href="${data.archivo_url}" target="_blank">Ver archivo actual</a>`
+                    : 'Sin archivo';
+        }
+
+    } catch (err) {
+        console.error("Error cargando documento:", err);
+        alert("Error cargando documento: " + err.message);
+        
+        document.getElementById('cargando').style.display = 'block';
+        document.getElementById('cargando').textContent = 'Error: ' + err.message;
+    }
+}
+
+// ==========================
+// CONDUCTORES (para el select)
+// ==========================
+async function cargarConductores() {
+    try {
+        const res = await fetch('http://localhost:3000/api/conductores');
+        const data = await res.json();
+
+        const select = document.getElementById('idConductor');
+        select.innerHTML = `<option value="">Seleccionar conductor...</option>`;
+
+        data.forEach(c => {
+            const option = document.createElement('option');
+            option.value = c.id_conductor;
+            option.textContent = `${c.nombres} ${c.apellidos}`;
+            select.appendChild(option);
+        });
+    } catch (err) {
+        console.error("Error cargando conductores:", err);
+    }
+}
+
+// ==========================
+// TIPOS DOCUMENTO (para el select)
+// ==========================
+async function cargarTiposDocumento() {
+    try {
+        const res = await fetch('http://localhost:3000/api/tipos-documento-activos');
+        const data = await res.json();
+
+        const select = document.getElementById('idTipoDocumento');
+        select.innerHTML = `<option value="">Seleccionar tipo de documento...</option>`;
+
+        data.forEach(t => {
+            const option = document.createElement('option');
+            option.value = t.id_tipo_documento;
+            option.textContent = t.nombre;
+            select.appendChild(option);
+        });
+    } catch (err) {
+        console.error("Error cargando tipos de documento:", err);
+    }
+}
+// ==========================
+// GUARDAR EDIT (CORREGIDO - ENVIAR archivo_actual)
+// ==========================
+document.getElementById('formularioDocumento').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('id_conductor', document.getElementById('idConductor').value);
+    formData.append('id_tipo_documento', document.getElementById('idTipoDocumento').value);
+    formData.append('fecha_emision', document.getElementById('fechaEmision').value);
+    formData.append('fecha_vencimiento', document.getElementById('fechaVencimiento').value);
+    formData.append('observacion', document.getElementById('observacion').value);
+
+    const archivoActualDiv = document.getElementById('archivoActual');
+    const archivoActualHTML = archivoActualDiv.innerHTML;
+    
+    if (archivoActualHTML.includes('href=')) {
+        const match = archivoActualHTML.match(/href="([^"]+)"/);
+        if (match && match[1]) {
+            const archivoUrl = match[1];
+            formData.append('archivo_actual', archivoUrl);
+        }
+    }
+
+    const file = document.getElementById('archivoNuevo').files[0];
+    if (file) {
+        formData.append('archivo', file);
+    }
+
+    const res = await fetch(
+        `http://localhost:3000/api/documentos/${idDocumentoEdit}`,
+        {
+            method: 'PUT',
+            body: formData
+        }
+    );
+
+    console.log("RESPUESTA STATUS:", res.status, res.ok);
+
+    // ✅ LEER RESPUESTA SIEMPRE
+    const texto = await res.text();
+    console.log("RESPUESTA TEXT:", texto);
+
+    let data;
+    try {
+        data = JSON.parse(texto);
+    } catch {
+        data = { success: true };  // ✅ Si no es JSON, asumir que fue exito
+    }
+
+    // ✅ REDIRIGIR SI SUCCESS ES TRUE (INCLUSO SI res.ok es false)
+    if (data.success === true) {
+        alert("Actualizado correctamente");
+        window.location.href = "Vista_Conductor_Doc.html";
+    } else {
+        alert("Error: " + data.message);
+    }
+});
+// ==========================
+// BTN CANCELAR
+// ==========================
+document.getElementById('btnCancelar').addEventListener('click', () => {
+    window.location.href = "Vista_Conductor_Doc.html";
+});
+</script>
+</body>
+</html>

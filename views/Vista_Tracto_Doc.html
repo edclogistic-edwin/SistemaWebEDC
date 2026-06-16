@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentos del Tracto - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/style_tracto_doc.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+            
+            <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+            
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>Documentos del Tracto</h1>
+        
+        <!-- FILTRO + B�sSQUEDA -->
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+            <select id="filtroTracto" style="padding: 12px 16px; border: 1px solid var(--primary-red); border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; min-width: 250px;">
+                <option value="">Todos los tractos</option>
+            </select>
+            
+            <input type="text" id="buscador" placeholder="Buscar por Tracto (Placa) o Tipo de Documento..." style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif;">
+            
+            <button id="btnBuscar" style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;">Buscar</button>
+            <button id="btnRefrescar" style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;">Refrescar</button>
+        </div>
+        
+        <a href="agregar_documento_tracto.html">
+            <button class="btn-agregar" style="border: none; background: transparent; cursor: pointer;">Agregar Tracto</button>
+        </a>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tracto (Placa)</th>
+                        <th>Tipo de Documento</th>
+                        <th>Fecha Emisión</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Archivo</th>
+                        <th>Observación</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaTractoDoc">
+                    <tr>
+                        <td colspan="9">Cargando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/dropdown.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let todosLosDocumentos = [];
+        let tractosData = [];
+        
+        // Cargar tractos para el filtro (usando placa)
+        async function cargarTractos() {
+            const { data, error } = await supabaseClient
+                .from('tracto')
+                .select('*')
+                .eq('estado', true)
+                .order('placa');
+            
+            if (error) {
+                console.error('Error al cargar tractos:', error);
+                return;
+            }
+            
+            tractosData = data;
+            
+            const filtroTracto = document.getElementById('filtroTracto');
+            
+            data.forEach(tracto => {
+                const option = document.createElement('option');
+                option.value = tracto.id_tracto;
+                option.textContent = `${tracto.placa} - ${tracto.marca || ''} ${tracto.modelo || ''}`.trim();
+                filtroTracto.appendChild(option);
+            });
+        }
+        
+        async function cargarDocumentos() {
+            const tbody = document.getElementById('tablaTractoDoc');
+            
+            // JOIN con tracto y tipo_documento (usando placa)
+            const { data, error } = await supabaseClient
+                .from('documento_tracto')
+                .select(`
+                    id_documento,
+                    id_tracto,
+                    id_tipo_documento,
+                    archivo_url,
+                    fecha_emision,
+                    fecha_vencimiento,
+                    estado,
+                    observacion,
+                    tracto: id_tracto (placa, marca, modelo),
+                    tipo_documento: id_tipo_documento (nombre)
+                `)
+                .order('id_documento', { ascending: false });
+            
+            if (error) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: red;">Error: ' + error.message + '</td></tr>';
+                return;
+            }
+            
+            todosLosDocumentos = data;
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9">No hay documentos registrados</td></tr>';
+                return;
+            }
+            
+            mostrarDocumentos(data);
+        }
+        
+        // FUNCI�"N para calcular estado de vencimiento (Activo/Vence pronto/Vencido)
+        function obtenerEstadoVencimiento(fechaVencimientoStr) {
+            if (!fechaVencimientoStr) {
+                return { texto: '-', color: '#666', badge: 'sin-vencimiento' };
+            }
+            
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            
+            const vencimiento = new Date(fechaVencimientoStr);
+            vencimiento.setHours(0, 0, 0, 0);
+            
+            // Calcular diferencia en días
+            const diferenciaMs = vencimiento - hoy;
+            const diasRestantes = Math.ceil(diferenciaMs / (1000 * 60 * 60 * 24));
+            
+            if (diasRestantes <= 0) {
+                // VENCIDO (incluye el día mismo de vencimiento)
+                return {
+                    texto: 'Vencido',
+                    color: '#dc2626',
+                    badge: 'vencido',
+                    dias: diasRestantes
+                };
+            } else if (diasRestantes <= 7) {
+                // VENCE PRONTO (1-7 días)
+                const textoDias = diasRestantes === 1 ? '1 día' : `${diasRestantes} días`;
+                return {
+                    texto: ` Vence en ${textoDias}`,
+                    color: '#f59e0b',
+                    badge: 'vence-pronto',
+                    dias: diasRestantes
+                };
+            } else {
+                // ACTIVO (más de 7 días)
+                return {
+                    texto: fechaVencimientoStr.slice(0, 10),
+                    color: '#059669',
+                    badge: 'activo',
+                    dias: diasRestantes
+                };
+            }
+        }
+        
+        function mostrarDocumentos(documentos) {
+            const tbody = document.getElementById('tablaTractoDoc');
+            
+            if (documentos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9">No se encontraron documentos</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = documentos.map(d => {
+                const tracto = d.tracto;
+                const tipo = d.tipo_documento;
+                const tractoNombre = tracto ? `${tracto.placa} ${tracto.marca || ''} ${tracto.modelo || ''}`.trim() : 'Desconocido';
+                const tipoNombre = tipo ? tipo.nombre : 'Desconocido';
+                const fechaEmision = d.fecha_emision ? d.fecha_emision.slice(0,10) : '-';
+                
+                // Obtener estado de vencimiento
+                const estadoVencimiento = obtenerEstadoVencimiento(d.fecha_vencimiento);
+                
+                return `
+                    <tr style="${!d.estado ? 'background: #f5f5f5; color: #666;' : ''}">
+                        <td>${d.id_documento}</td>
+                        <td>${tractoNombre}</td>
+                        <td>${tipoNombre}</td>
+                        <td>${fechaEmision}</td>
+                        <td style="font-weight: 600; color: ${estadoVencimiento.color};">
+                            ${estadoVencimiento.texto}
+                        </td>
+                        <td>
+                            <a href="${d.archivo_url || ''}" target="_blank" style="color: #0ea5e9; text-decoration: none; font-weight: 600;">
+                                 Ver PDF
+                            </a>
+                        </td>
+                        <td>${d.observacion || '-'}</td>
+                        <td>
+                            <button onclick="toggleEstadoDocumento(${d.id_documento}, ${d.estado})" 
+                                style="padding: 6px 12px; border: none; border-radius: 6px; background: ${d.estado ? '#059669' : '#dc2626'}; color: white; font-size: 13px; font-weight: 600; cursor: pointer;">
+                                ${d.estado ? 'Activo' : 'Inactivo'}
+                            </button>
+                        </td>
+                        <td style="text-align: center;">
+                            <a href="editar_documento_tracto.html?id=${d.id_documento}" style="color: #0ea5e9; text-decoration: none; font-weight: 600; margin-right: 8px;">Editar</a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Toggle estado (Activo/Inactivo)
+        async function toggleEstadoDocumento(idDocumento, estadoActual) {
+            const nuevoEstado = !estadoActual;
+            
+            const { error } = await supabaseClient
+                .from('documento_tracto')
+                .update({ estado: nuevoEstado })
+                .eq('id_documento', idDocumento);
+            
+            if (error) {
+                alert('Error: ' + error.message);
+                return;
+            }
+            
+            // Actualizar tabla
+            cargarDocumentos();
+        }
+        
+        // FUNCI�"N DE FILTRO + B�sSQUEDA
+        function filtrarDocumentos() {
+            const idTracto = document.getElementById('filtroTracto').value;
+            const termino = document.getElementById('buscador').value.toLowerCase().trim();
+            
+            let filtrados = todosLosDocumentos;
+            
+            // Filtro por tracto
+            if (idTracto !== '') {
+                filtrados = filtrados.filter(d => d.id_tracto === parseInt(idTracto));
+            }
+            
+            // Búsqueda por tracto (placa) o tipo
+            if (termino !== '') {
+                filtrados = filtrados.filter(d => {
+                    const tracto = d.tracto;
+                    const tipo = d.tipo_documento;
+                    const tractoNombre = tracto ? `${tracto.placa} ${tracto.marca || ''} ${tracto.modelo || ''}`.toLowerCase() : '';
+                    const tipoNombre = tipo ? tipo.nombre.toLowerCase() : '';
+                    
+                    return tractoNombre.includes(termino) || tipoNombre.includes(termino);
+                });
+            }
+            
+            mostrarDocumentos(filtrados);
+        }
+        
+        // EVENTOS
+        document.getElementById('filtroTracto').addEventListener('change', filtrarDocumentos);
+        document.getElementById('btnBuscar').addEventListener('click', filtrarDocumentos);
+        
+        document.getElementById('buscador').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                filtrarDocumentos();
+            }
+        });
+        
+        document.getElementById('btnRefrescar').addEventListener('click', () => {
+            document.getElementById('filtroTracto').value = '';
+            document.getElementById('buscador').value = '';
+            mostrarDocumentos(todosLosDocumentos);
+        });
+        
+        cargarTractos();
+        cargarDocumentos();
+        
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = '../index.html';
+        });
+        
+        document.getElementById('perfilBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'Vista_Perfil.html';
+        });
+    </script>
+</body>
+</html>

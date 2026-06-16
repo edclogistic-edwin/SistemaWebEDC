@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Tarifa - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/crear_tarifa.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+            <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 id="tituloFormulario"> Agregar Tarifa</h1>
+
+        <form id="formTarifa" class="form-tarifa">
+            <div class="form-grid">
+                <!-- TIPO DE CARGA -->
+                <div class="form-group">
+                    <label for="tipo_carga">Tipo de Carga *</label>
+                    <select id="tipo_carga" name="tipo_carga" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="GENERAL">General</option>
+                        <option value="IMO">IMO</option>
+                    </select>
+                </div>
+
+                <!-- ZONA -->
+                <div class="form-group">
+                    <label for="zona">Zona *</label>
+                    <select id="zona" name="zona" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="ZONA 1">ZONA 1</option>
+                        <option value="ZONA 2">ZONA 2</option>
+                        <option value="ZONA 3">ZONA 3</option>
+                        <option value="ZONA 4.1">ZONA 4.1</option>
+                        <option value="ZONA 4.2">ZONA 4.2</option>
+                        <option value="ZONA 5">ZONA 5</option>
+                        <option value="ZONA X">ZONA X</option>
+                    </select>
+                </div>
+
+                <!-- PUNTO DE PARTIDA -->
+                <div class="form-group">
+                    <label for="punto_partida">Punto de Partida</label>
+                    <input type="text" id="punto_partida" name="punto_partida" placeholder="Ej: Terminal A">
+                </div>
+
+                <!-- PUNTO DE LLEGADA -->
+                <div class="form-group">
+                    <label for="punto_llegada">Punto de Llegada</label>
+                    <input type="text" id="punto_llegada" name="punto_llegada" placeholder="Ej: Destino B">
+                </div>
+
+                <!-- PRECIO -->
+                <div class="form-group">
+                    <label for="precio">Precio (USD) *</label>
+                    <input type="number" id="precio" name="precio" step="0.01" min="0" placeholder="0.00" required>
+                </div>
+
+                <!-- NUMERO DE FACTURA -->
+                <div class="form-group">
+                    <label for="numero_factura">Número de Factura</label>
+                    <input type="text" id="numero_factura" name="numero_factura" placeholder="Ej: F-12345">
+                </div>
+
+                <!-- AGENCIA -->
+                <div class="form-group">
+                    <label for="agencia">Agencia</label>
+                    <input type="text" id="agencia" name="agencia" placeholder="Ej: Agencia Lima">
+                </div>
+
+                <!-- ESTADO -->
+                <div class="form-group">
+                    <label for="estado">Estado</label>
+                    <select id="estado" name="estado">
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
+
+                <!-- FECHA INICIO -->
+                <div class="form-group">
+                    <label for="fecha_inicio">Fecha de Inicio *</label>
+                    <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+                </div>
+
+                <!-- FECHA FIN -->
+                <div class="form-group">
+                    <label for="fecha_fin">Fecha de Fin *</label>
+                    <input type="date" id="fecha_fin" name="fecha_fin" required>
+                </div>
+
+                <!-- OBSERVACION -->
+                <div class="form-group form-full">
+                    <label for="observacion">Observación</label>
+                    <textarea id="observacion" name="observacion" rows="3" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="window.location.href='Vista_Tarifa.html'"> Cancelar</button>
+                <button type="submit" class="btn-save">Guardar Tarifa</button>
+            </div>
+        </form>
+
+        <div id="mensaje" class="mensaje"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+         const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const form = document.getElementById('formTarifa');
+        const mensaje = document.getElementById('mensaje');
+        const titulo = document.getElementById('tituloFormulario');
+        let idEditar = null;
+
+        // Verificar si es edición
+        const urlParams = new URLSearchParams(window.location.search);
+        idEditar = urlParams.get('id');
+
+        if (idEditar) {
+            titulo.textContent = '�o�️ Editar Tarifa';
+            cargarTarifaParaEditar(idEditar);
+        }
+
+        async function cargarTarifaParaEditar(id) {
+            const { data, error } = await supabaseClient.from('tarifa').select('*').eq('id_tarifa', id).single();
+
+            if (error) {
+                mostrarMensaje('Error cargando tarifa: ' + error.message, 'error');
+                return;
+            }
+
+            document.getElementById('tipo_carga').value = data.tipo_carga;
+            document.getElementById('zona').value = data.zona;
+            document.getElementById('punto_partida').value = data.punto_partida || '';
+            document.getElementById('punto_llegada').value = data.punto_llegada || '';
+            document.getElementById('precio').value = data.precio;
+            document.getElementById('numero_factura').value = data.numero_factura || '';
+            document.getElementById('agencia').value = data.agencia || '';
+            document.getElementById('estado').value = data.estado.toString();
+            document.getElementById('fecha_inicio').value = data.fecha_inicio ? data.fecha_inicio.slice(0, 10) : '';
+            document.getElementById('fecha_fin').value = data.fecha_fin ? data.fecha_fin.slice(0, 10) : '';
+            document.getElementById('observacion').value = data.observacion || '';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const datos = {
+                tipo_carga: document.getElementById('tipo_carga').value,
+                zona: document.getElementById('zona').value,
+                punto_partida: document.getElementById('punto_partida').value,
+                punto_llegada: document.getElementById('punto_llegada').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                numero_factura: document.getElementById('numero_factura').value,
+                agencia: document.getElementById('agencia').value,
+                estado: document.getElementById('estado').value === 'true',
+                fecha_inicio: document.getElementById('fecha_inicio').value,
+                fecha_fin: document.getElementById('fecha_fin').value,
+                observacion: document.getElementById('observacion').value
+            };
+
+            if (idEditar) {
+                // EDICI�"N
+                const { error } = await supabaseClient.from('tarifa').update(datos).eq('id_tarifa', idEditar);
+                if (error) {
+                    mostrarMensaje('Error editando tarifa: ' + error.message, 'error');
+                    return;
+                }
+                mostrarMensaje('Tarifa actualizada!', 'success');
+            } else {
+                // NUEVA
+                const { error } = await supabaseClient.from('tarifa').insert([datos]);
+                if (error) {
+                    mostrarMensaje('Error agregando tarifa: ' + error.message, 'error');
+                    return;
+                }
+                mostrarMensaje('Tarifa agregada!', 'success');
+            }
+
+            setTimeout(() => { window.location.href = 'Vista_Tarifa.html'; }, 1500);
+        });
+
+        function mostrarMensaje(texto, tipo) {
+            mensaje.textContent = texto;
+            mensaje.style.display = 'block';
+            mensaje.className = tipo === 'error' ? 'mensaje error' : 'mensaje success';
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => { e.preventDefault(); localStorage.clear(); window.location.href = '../index.html'; });
+        document.getElementById('perfilBtn').addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'Vista_Perfil.html'; });
+    </script>
+</body>
+</html>

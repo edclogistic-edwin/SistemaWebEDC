@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarifas - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/Vista_Tarifa.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+            <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Tarifas</h1>
+
+        <div class="tarifa-layout">
+            <div class="zona-info">
+                <h2>Información de Zonas MTC</h2>
+                <table class="tabla-zonas">
+                    <thead>
+                        <tr>
+                            <th>ZONA MTC</th>
+                            <th>ZONA</th>
+                            <th>DISTRITOS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ZONA II</td>
+                            <td class="zona-numero">ZONA 1</td>
+                            <td>Callao, La Punta, Bellavista, La Perla, Carmen de la Legua, Complejo SINI</td>
+                        </tr>
+                        <tr>
+                            <td>ZONA II</td>
+                            <td class="zona-numero">ZONA 2</td>
+                            <td>Rímac, Magdalena, SMP, Los Olivos, Jesús María, Pueblo Libre, Independencia, Breña y
+                                Cercado de Lima</td>
+                        </tr>
+                        <tr>
+                            <td>ZONA II</td>
+                            <td class="zona-numero">ZONA 3</td>
+                            <td>Ate, Vitarte, Santa Anita, San Luis, El Agustino, Puente Piedra, SJL, Surquillo,
+                                Ventanilla y Comas Trapiche</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="zona-numero">ZONA 4.1</td>
+                            <td>Huachipa, Carabayllo</td>
+                        </tr>
+                        <tr>
+                            <td>ZONA II</td>
+                            <td class="zona-numero">ZONA 4.2</td>
+                            <td>Santa Clara, Chorrillos, La Molina, VMT, SJM, Villa El Salvador, Lurigancho</td>
+                        </tr>
+                        <tr>
+                            <td>ZONA II</td>
+                            <td class="zona-numero">ZONA 5</td>
+                            <td>Cajamarquilla, Lurín, Chaclacayo (Ñaña), Pachacámac, Ancón, Santa Rosa</td>
+                        </tr>
+                        <tr>
+                            <td>ZONA III</td>
+                            <td class="zona-numero">ZONA X</td>
+                            <td>Jicamarca, Punta Negra, San Bartolo, Punta Hermosa</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tabla-tarifas">
+                <h2>Lista de Tarifas</h2>
+
+                <div class="filtros">
+                    <input type="text" id="busqueda" placeholder="Buscar por zona, agencia, factura..."
+                        oninput="filtrarTarifas()">
+                    <select id="filtroTipo" onchange="filtrarTarifas()">
+                        <option value="">Todos los tipos</option>
+                        <option value="GENERAL">General</option>
+                        <option value="IMO">IMO</option>
+                    </select>
+                    <button class="btn-create" onclick="window.location.href='crear_tarifa.html'">➕ Crear
+                        Tarifa</button>
+                </div>
+
+                <table class="tabla-tarifas-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Zona</th>
+                            <th>Punto Partida</th>
+                            <th>Punto Llegada</th>
+                            <th>Precio</th>
+                            <th>Factura</th>
+                            <th>Agencia</th>
+                            <th>Estado</th>
+                            <th>Vigencia</th>
+                            <th>Observación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaTarifas">
+                        <tr>
+                            <td colspan="11" style="text-align: center; padding: 40px;">Cargando tarifas...</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div id="mensaje" class="mensaje"></div>
+            </div>
+        </div>
+
+        <!-- BOTÓN PARA MOSTRAR/OCULTAR CARTEL DE TARIFAS -->
+        <button onclick="toggleCartel()" class="btn-cartel"
+            style="margin-top: 24px; padding: 12px 24px; background: #0ea5e9; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;">
+            📋 Ver Tarifas por Zona (GENERAL / IMO)
+        </button>
+
+        <!-- CARTEL DE TARIFAS (OCULTO POR DEFECTO) -->
+        <div id="cartelTarifas" class="cartel-tarifas" style="display: none; margin-top: 16px;">
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #333;">💰 Tarifas por Zona</h3>
+
+            <div class="cartel-columnas">
+                <div class="cartel-columna">
+                    <h4
+                        style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #2b7a3b; background: #f0fdf4; padding: 10px; border-radius: 6px;">
+                        📦 TARIFA - CARGA GENERAL - 20 y 40 pies</h4>
+                    <table class="cartel-tabla">
+                        <thead>
+                            <tr>
+                                <th>ZONA</th>
+                                <th>PRECIO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ZONA 1</td>
+                                <td class="precio-cartel">S/ 600.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA 2</td>
+                                <td class="precio-cartel">S/ 780.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA 3</td>
+                                <td class="precio-cartel">S/ 850.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA 4.1</td>
+                                <td class="precio-cartel">S/ 980.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA 4.2</td>
+                                <td class="precio-cartel">S/ 1,000.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA 5</td>
+                                <td class="precio-cartel">S/ 1,200.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA X</td>
+                                <td class="precio-cartel">S/ 1,300.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="cartel-columna">
+                    <h4
+                        style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #0ea5e9; background: #f0f9ff; padding: 10px; border-radius: 6px;">
+                        🚢 TARIFA - CARGA IMO - 20 y 40 pies</h4>
+                    <table class="cartel-tabla">
+                        <thead>
+                            <tr>
+                                <th>ZONA</th>
+                                <th>PRECIO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ZONA 1</td>
+                                <td class="precio-cartel">S/ 800.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA 2</td>
+                                <td class="precio-cartel">S/ 1,000.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA 3</td>
+                                <td class="precio-cartel">S/ 1,100.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA 4.1</td>
+                                <td class="precio-cartel">S/ 1,250.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA 4.2</td>
+                                <td class="precio-cartel">S/ 1,280.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA 5</td>
+                                <td class="precio-cartel">S/ 1,300.00</td>
+                            </tr>
+                            <tr>
+                                <td>ZONA X</td>
+                                <td class="precio-cartel">S/ 1,400.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let todasLasTarifas = [];
+
+        async function cargarTarifas() {
+            const { data, error } = await supabaseClient.from('tarifa').select('*').order('tipo_carga', { ascending: true }).order('zona', { ascending: true });
+
+            if (error) {
+                document.getElementById('tablaTarifas').innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 40px; color: red;">Error: ' + error.message + '</td></tr>';
+                return;
+            }
+
+            todasLasTarifas = data || [];
+            mostrarTarifas(todasLasTarifas);
+        }
+
+        function mostrarTarifas(tarifas) {
+            const tbody = document.getElementById('tablaTarifas');
+            if (tarifas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 40px;">No hay tarifas registradas</td></tr>';
+                return;
+            }
+            tbody.innerHTML = tarifas.map(t => `
+<tr class="${t.estado ? '' : 'fila-inactiva'}">
+    <td class="${t.tipo_carga === 'IMO' ? 'tipo-imo' : 'tipo-general'}">${t.tipo_carga}</td>
+    <td class="zona-numero">${t.zona}</td>
+    <td>${t.punto_partida || '-'}</td>
+    <td>${t.punto_llegada || '-'}</td>
+    <td class="precio">$ ${Number(t.precio).toFixed(2)}</td>
+    <td>${t.numero_factura || '-'}</td>
+    <td>${t.agencia || '-'}</td>
+    <td class="${t.estado ? 'estado-activo' : 'estado-inactivo'}">${t.estado ? 'Activo' : 'Inactivo'}</td>
+    <td>${t.fecha_inicio ? t.fecha_inicio.slice(0, 10) : '-'} → ${t.fecha_fin ? t.fecha_fin.slice(0, 10) : '-'}</td>
+    <td title="${t.observacion || ''}">${(t.observacion || '-').substring(0, 30)}${t.observacion && t.observacion.length > 30 ? '...' : ''}</td>
+    <td>
+        <button onclick="editarTarifa(${t.id_tarifa})" class="btn-edit">Editar</button>
+        <button onclick="toggleEstadoTarifa(${t.id_tarifa}, ${t.estado})" class="btn-delete">
+            ${t.estado ? 'Inactivar' : 'Activar'}
+        </button>
+    </td>
+</tr>
+`).join('');
+        }
+
+        function filtrarTarifas() {
+            const termino = document.getElementById('busqueda').value.toLowerCase();
+            const tipo = document.getElementById('filtroTipo').value;
+            const filtradas = todasLasTarifas.filter(t => (t.zona?.toLowerCase().includes(termino) || t.agencia?.toLowerCase().includes(termino) || t.punto_partida?.toLowerCase().includes(termino) || t.numero_factura?.toLowerCase().includes(termino)) && (tipo === '' || t.tipo_carga === tipo));
+            mostrarTarifas(filtradas);
+        }
+
+        function editarTarifa(id) { window.location.href = 'crear_tarifa.html?id=' + id; }
+
+        async function toggleEstadoTarifa(id, estadoActual) {
+            const nuevoEstado = !estadoActual;
+            const accion = nuevoEstado ? 'activar' : 'desactivar';
+
+            if (!confirm(`¿Estás seguro de ${accion} esta tarifa?`)) return;
+
+            const { error } = await supabaseClient
+                .from('tarifa')
+                .update({ estado: nuevoEstado })
+                .eq('id_tarifa', id);
+
+            if (error) {
+                alert('Error: ' + error.message);
+                return;
+            }
+
+            mostrarMensaje(`Tarifa ${nuevoEstado ? 'activada' : 'desactivada'}!`, 'success');
+            cargarTarifas();
+        }
+        function mostrarMensaje(texto, tipo) {
+            const mensaje = document.getElementById('mensaje');
+            mensaje.textContent = texto;
+            mensaje.style.display = 'block';
+            mensaje.className = tipo === 'error' ? 'mensaje error' : 'mensaje success';
+
+            setTimeout(() => {
+                mensaje.style.display = 'none';
+            }, 3000);
+        }
+
+        function toggleCartel() {
+            const cartel = document.getElementById('cartelTarifas');
+            const btn = document.querySelector('.btn-cartel');
+            if (cartel.style.display === 'none') {
+                cartel.style.display = 'block';
+                btn.textContent = '🔒 Ocultar Tarifas por Zona';
+            } else {
+                cartel.style.display = 'none';
+                btn.textContent = '📋 Ver Tarifas por Zona (GENERAL / IMO)';
+            }
+        }
+
+        cargarTarifas();
+        document.getElementById('logoutBtn').addEventListener('click', (e) => { e.preventDefault(); localStorage.clear(); window.location.href = '../index.html'; });
+        document.getElementById('perfilBtn').addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'Vista_Perfil.html'; });
+    </script>
+</body>
+
+</html>

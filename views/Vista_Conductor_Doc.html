@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentos del Conductor - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/style_conductor_doc.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+
+            <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Documentos del Conductor</h1>
+
+        <!-- FILTRO + B�sSQUEDA -->
+        <div style="display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+            <select id="filtroConductor"
+                style="padding: 12px 16px; border: 1px solid var(--primary-red); border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif; min-width: 250px;">
+                <option value="">Todos los conductores</option>
+            </select>
+
+            <input type="text" id="buscador" placeholder="Buscar por Conductor o Tipo de Documento..."
+                style="flex: 1; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif;">
+
+            <button id="btnBuscar"
+                style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;">Buscar</button>
+            <button id="btnRefrescar"
+                style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;">Refrescar</button>
+        </div>
+
+        <a href="agregar_documento.html">
+            <button class="btn-agregar" style="border: none; background: transparent; cursor: pointer;">Agregar
+                Documento</button>
+        </a>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Conductor</th>
+                        <th>Tipo de Documento</th>
+                        <th>Fecha Emisión</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Archivo</th>
+                        <th>Observación</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaConductorDoc">
+                    <tr>
+                        <td colspan="9">Cargando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="paginacionDoc"
+            style="margin-top: 20px; display: flex; gap: 10px; align-items: center; justify-content: center;"></div>
+    </div>
+
+    <script src="../js/dropdown.js"></script>
+    <script>
+
+        let todosLosDocumentos = [];
+        let conductoresData = [];
+        let paginaActual = 1;
+        const filasPorPagina = 10;
+
+        // ==========================
+        // CARGAR CONDUCTORES
+        // ==========================
+        async function cargarConductores() {
+
+            const res = await fetch('http://localhost:3000/api/conductores');
+            const data = await res.json();
+
+            conductoresData = data;
+
+            const filtroConductor = document.getElementById('filtroConductor');
+
+            data.forEach(conductor => {
+
+                const option = document.createElement('option');
+                option.value = conductor.id_conductor;
+                option.textContent = `${conductor.nombres} ${conductor.apellidos}`;
+
+                filtroConductor.appendChild(option);
+            });
+        }
+
+        // ==========================
+        // CARGAR DOCUMENTOS
+        // ==========================
+        async function cargarDocumentos() {
+
+            const tbody = document.getElementById('tablaConductorDoc');
+
+            const res = await fetch('http://localhost:3000/api/documentos');
+            const data = await res.json();
+
+            todosLosDocumentos = data;
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9">No hay documentos</td></tr>';
+                return;
+            }
+
+            mostrarDocumentos(data);
+        }
+
+        // ==========================
+        // MOSTRAR TABLA
+        // ==========================
+  function mostrarDocumentos(documentos) {
+    const tbody = document.getElementById('tablaConductorDoc');
+    const totalPaginas = Math.ceil(documentos.length / filasPorPagina);
+    const inicio = (paginaActual - 1) * filasPorPagina;
+    const fin = inicio + filasPorPagina;
+    const docs = documentos.slice(inicio, fin);
+
+    tbody.innerHTML = docs.map(d => {
+        const conductorNombre = d.nombres ? `${d.nombres} ${d.apellidos}` : 'Desconocido';
+        const tipoNombre = d.tipo_documento || 'Desconocido';
+
+        // ✅ CALCULAR COLOR DE fecha_vencimiento (LÓGICA CORREGIDA)
+        let fechaVencimientoColor;
+        if (d.fecha_vencimiento) {
+            const fechaVenc = new Date(d.fecha_vencimiento);
+            const hoy = new Date();
+            const diffDias = Math.ceil((fechaVenc - hoy) / (1000 * 60 * 60 * 24));
+            
+            if (diffDias < 0) {
+                fechaVencimientoColor = 'red'; // Ya venció
+            } else if (diffDias <= 7) {
+                fechaVencimientoColor = '#D4A017'; // 1 a 7 días (amarillo)
+            } else {
+                fechaVencimientoColor = 'green'; // Más de 7 días (verde)
+            }
+        } else {
+            fechaVencimientoColor = null;
+        }
+
+        return `
+<tr>
+    <td>${d.id_documento}</td>
+    <td>${conductorNombre}</td>
+    <td>${tipoNombre}</td>
+    <td>${d.fecha_emision?.slice(0,10) || '-'}</td>
+    <td>
+        ${d.fecha_vencimiento ? 
+            `<span style="color: ${fechaVencimientoColor}; font-weight: 600;">${d.fecha_vencimiento.slice(0, 10)}</span>` 
+            : '-'}
+    </td>
+    <td><a href="${d.archivo_url}" target="_blank">Ver PDF</a></td>
+    <td>${d.observacion || '-'}</td>
+    <td>
+        <span 
+            style="color:${d.estado ? 'green' : 'red'}; cursor: pointer;" 
+            onclick="toggleEstado(${d.id_documento}, ${d.estado})">
+            ${d.estado ? 'Activo' : 'Inactivo'}
+        </span>
+    </td>
+    <td><a href="editar_documento.html?id=${d.id_documento}">Editar</a></td>
+</tr>
+`;
+    }).join('');
+
+    renderPaginacion(totalPaginas);
+}
+
+        // ==========================
+        // TOGGLE ESTADO
+        // ==========================
+       async function toggleEstado(id, estadoActual) {
+    try {
+        await fetch(`http://localhost:3000/api/documentos/${id}/estado`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ estado: !estadoActual })
+        });
+
+        // ✅ Recargar solo la tabla (no todos los conductores)
+        cargarDocumentos();
+    } catch (err) {
+        console.error("Error toggleando estado:", err);
+        alert("Error al cambiar estado");
+    }
+}
+
+        // ==========================
+        // FILTROS (igual lógica)
+        // ==========================
+        function filtrarDocumentos(reset = true) {
+
+            if (reset) paginaActual = 1;
+
+            const idConductor = document.getElementById('filtroConductor').value;
+            const termino = document.getElementById('buscador').value.toLowerCase();
+
+            let filtrados = todosLosDocumentos;
+
+            if (idConductor) {
+                filtrados = filtrados.filter(d => d.id_conductor == idConductor);
+            }
+
+            if (termino) {
+                filtrados = filtrados.filter(d =>
+                    (d.nombres + ' ' + d.apellidos).toLowerCase().includes(termino) ||
+                    (d.tipo_nombre || '').toLowerCase().includes(termino)
+                );
+            }
+
+            mostrarDocumentos(filtrados);
+        }
+
+        // ==========================
+        // PAGINACIÓN
+        // ==========================
+        function renderPaginacion(total) {
+
+            const cont = document.getElementById('paginacionDoc');
+
+            cont.innerHTML = `
+        <button ${paginaActual === 1 ? 'disabled' : ''} onclick="cambiarPagina(-1)">Anterior</button>
+        <span>${paginaActual} / ${total}</span>
+        <button ${paginaActual === total ? 'disabled' : ''} onclick="cambiarPagina(1)">Siguiente</button>
+    `;
+        }
+
+        function cambiarPagina(cambio) {
+            paginaActual += cambio;
+            filtrarDocumentos(false);
+        }
+
+        // ==========================
+        // INIT
+        // ==========================
+        cargarConductores();
+        cargarDocumentos();
+
+    </script>
+</body>
+
+</html>

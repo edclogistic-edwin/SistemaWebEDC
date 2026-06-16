@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Documento - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/style_conductor_doc.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Agregar Nuevo Documento</h1>
+
+        <div class="welcome" style="max-width: 700px;">
+            <form id="formAgregarDocumento">
+                <div class="form-group">
+                    <label>Conductor *:</label>
+                    <select id="id_conductor" required
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                        <option value="">Seleccionar conductor...</option>
+                    </select>
+                    <p id="conductorLoading" style="font-size: 13px; color: var(--text-light); margin-top: 8px;">
+                        Cargando conductores...</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Documento *:</label>
+                    <select id="id_tipo_documento" required
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                        <option value="">Seleccionar tipo de documento...</option>
+                    </select>
+                    <p id="tipoLoading" style="font-size: 13px; color: var(--text-light); margin-top: 8px;">Cargando
+                        tipos de documento...</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha Emisión *:</label>
+                    <input type="date" id="fecha_emision" required
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha Vencimiento:</label>
+                    <input type="date" id="fecha_vencimiento"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                    <p id="vencimientoInfo" style="font-size: 13px; color: var(--text-light); margin-top: 4px;">Este
+                        campo es obligatorio si el tipo de documento requiere vencimiento</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Archivo PDF *:</label>
+                    <input type="file" id="archivo" accept=".pdf" required
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                    <p style="font-size: 13px; color: var(--text-light); margin-top: 4px;">Solo archivos PDF</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Observación:</label>
+                    <input type="text" id="observacion"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                </div>
+
+                <div class="form-group">
+                    <label>Estado:</label>
+                    <select id="estado"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                        <option value="true" selected>Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary"
+                    style="padding: 12px 32px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px;">Guardar
+                    Documento</button>
+            </form>
+
+            <div id="mensaje" class="error" style="display: none; margin-top: 16px; padding: 12px; border-radius: 6px;">
+            </div>
+        </div>
+
+        <a href="Vista_Conductor_Doc.html"
+            style="display: inline-block; margin-top: 24px; color: var(--primary-red); text-decoration: none; font-weight: 600;">
+            Volver a la lista de documentos</a>
+    </div>
+
+    <script>
+
+        const form =
+            document.getElementById('formAgregarDocumento');
+
+        const mensaje =
+            document.getElementById('mensaje');
+
+        const idConductorSelect =
+            document.getElementById('id_conductor');
+
+        const idTipoDocSelect =
+            document.getElementById('id_tipo_documento');
+
+        const fechaVencimiento =
+            document.getElementById('fecha_vencimiento');
+
+        const archivoInput =
+            document.getElementById('archivo');
+
+        const submitBtn =
+            form.querySelector('button[type="submit"]');
+
+        let tiposDocData = [];
+
+        // ==========================
+        // CARGAR CONDUCTORES (NEON)
+        // ==========================
+        async function cargarConductores() {
+
+            try {
+
+                const res = await fetch('http://localhost:3000/api/conductores');
+                const data = await res.json();
+
+                idConductorSelect.innerHTML =
+                    `<option value="">Seleccionar conductor...</option>`;
+
+                data.forEach(c => {
+
+                    const option = document.createElement('option');
+
+                    option.value = c.id_conductor;
+                    option.textContent = `${c.nombres} ${c.apellidos}`;
+
+                    idConductorSelect.appendChild(option);
+                });
+
+            } catch (err) {
+                mostrarMensaje(err.message, 'error');
+            }
+        }
+
+        // ==========================
+        // CARGAR TIPOS DOCUMENTO (NEON)
+        // ==========================
+        async function cargarTiposDoc() {
+
+            try {
+
+                const res = await fetch('http://localhost:3000/api/tipos-documento-activos');
+                const data = await res.json();
+
+                tiposDocData = data;
+
+                idTipoDocSelect.innerHTML =
+                    `<option value="">Seleccionar tipo de documento...</option>`;
+
+                data.forEach(t => {
+
+                    const option = document.createElement('option');
+
+                    option.value = t.id_tipo_documento;
+                    option.textContent = t.nombre;
+
+                    idTipoDocSelect.appendChild(option);
+                });
+
+            } catch (err) {
+                mostrarMensaje(err.message, 'error');
+            }
+        }
+
+        // ==========================
+        // CONTROL VENCIMIENTO DINÁMICO (CORREGIDO)
+        // ==========================
+        idTipoDocSelect.addEventListener('change', (e) => {
+            const tipo = tiposDocData.find(t => t.id_tipo_documento == e.target.value);
+
+            console.log("TIPO SELECTADO:", tipo); // ✅ Verificar qué datos recibe
+
+            // ✅ Si NO existe requiere_vencimiento, asumir que NO requiere
+            if (tipo && tipo.requiere_vencimiento === true) {
+                fechaVencimiento.required = true;
+                fechaVencimiento.disabled = false;
+                document.getElementById('vencimientoInfo').textContent = "Este campo es obligatorio";
+            } else {
+                fechaVencimiento.required = false;
+                fechaVencimiento.value = '';
+                fechaVencimiento.disabled = false; // ✅ Cambiado: no deshabilitar, solo no obligatorio
+                document.getElementById('vencimientoInfo').textContent = "Opcional (si el documento requiere vencimiento)";
+            }
+        });
+
+        // ==========================
+        // PREVIEW ARCHIVO
+        // ==========================
+        archivoInput.addEventListener('change', (e) => {
+
+            const file = e.target.files[0];
+
+            if (!file) return;
+
+            mostrarMensaje(`Archivo seleccionado: ${file.name}`, 'success');
+        });
+
+        form.addEventListener('submit', async (e) => {
+
+            e.preventDefault();
+
+            mensaje.style.display = 'none';
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+
+            try {
+
+                const formData = new FormData();
+
+                formData.append('id_conductor', idConductorSelect.value);
+                formData.append('id_tipo_documento', idTipoDocSelect.value);
+                formData.append('fecha_emision', document.getElementById('fecha_emision').value);
+                formData.append('fecha_vencimiento', document.getElementById('fecha_vencimiento').value);
+                formData.append('estado', document.getElementById('estado').value);
+                formData.append('observacion', document.getElementById('observacion').value);
+
+                // ==========================
+                // ARCHIVO (PDF / IMAGEN)
+                // ==========================
+                const file = archivoInput.files[0];
+
+                if (!file) {
+                    throw new Error('Debes seleccionar un archivo');
+                }
+
+                formData.append('archivo', file);
+
+                // ==========================
+                // ENVIAR AL BACKEND (NEON)
+                // ==========================
+                const response = await fetch(
+                    'http://localhost:3000/api/documentos',
+                    {
+                        method: 'POST',
+                        body: formData
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Error al guardar documento');
+                }
+
+                // ==========================
+                // ÉXITO
+                // ==========================
+                mostrarMensaje('Documento guardado con éxito', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'Vista_Conductor_Doc.html';  // ✅ Esto ya está
+                }, 1000);
+
+            } catch (err) {
+
+                mostrarMensaje(err.message, 'error');
+
+            } finally {
+
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Guardar Documento';
+            }
+        });
+
+        // ==========================
+        // MENSAJE
+        // ==========================
+        function mostrarMensaje(texto, tipo) {
+
+            mensaje.textContent = texto;
+            mensaje.style.display = 'block';
+            mensaje.className = `message ${tipo}`;
+        }
+
+        // ==========================
+        // INIT
+        // ==========================
+        cargarConductores();
+        cargarTiposDoc();
+
+    </script>
+</body>
+
+</html>

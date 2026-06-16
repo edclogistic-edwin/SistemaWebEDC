@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+     <link rel="stylesheet" href="../css/style_dashboard.css">
+    <style>
+        :root {
+            --primary-red: #dc2626;
+            --dark-red: #991b1b;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f3f4f6;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            color: var(--primary-red);
+        }
+
+        .nav-menu a.logout {
+            color: var(--primary-red);
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dropbtn:hover {
+            color: var(--primary-red);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 12px 20px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .dropdown-content a:hover {
+            background: var(--bg-light);
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 32px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 32px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: white;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .profile-avatar span {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .profile-info {
+            padding: 32px 24px;
+        }
+
+        .profile-info h2 {
+            margin: 0 0 8px 0;
+            color: var(--text-dark);
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .profile-role {
+            margin: 0 0 24px 0;
+            color: var(--primary-red);
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .profile-details {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .detail-item {
+            margin-bottom: 16px;
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-item label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-item p {
+            margin: 0;
+            font-size: 16px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .status-active {
+            color: #059669 !important;
+            font-weight: 600;
+        }
+
+        .profile-actions {
+            padding: 24px;
+            text-align: center;
+            background: #f9fafb;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-secondary {
+            padding: 12px 32px;
+            border: 2px solid var(--primary-red);
+            border-radius: 8px;
+            background: white;
+            color: var(--primary-red);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        /* Menú desplegable--------------*/
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            padding: 10px 18px;
+            font-size: 15px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .dropbtn:hover {
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--white);
+            min-width: 180px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1001;
+            border-radius: 8px;
+            margin-top: 8px;
+            overflow: hidden;
+
+        }
+
+        .dropdown-content a {
+            color: var(--text-dark);
+            padding: 14px 20px;
+            text-decoration: none;
+            display: block;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+            padding-left: 24px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+            <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" >Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" >Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Mi Perfil</h1>
+
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <span id="avatarInitial">U</span>
+                </div>
+            </div>
+
+            <div class="profile-info">
+                <h2 id="perfilNombre">Cargando...</h2>
+                <p class="profile-role" id="perfilRol">Cargando...</p>
+
+                <div class="profile-details">
+                    <div class="detail-item">
+                        <label>Correo Electrónico:</label>
+                        <p id="perfilCorreo">Cargando...</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <label>Estado:</label>
+                        <p class="status-active">Activo</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <a href="dashboard.html" class="btn-secondary">Volver al Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/dropdown.js"></script>
+    <script>
+        // Cargar datos del usuario desde localStorage (SOLO los que existen en tu tabla)
+        const nombre = localStorage.getItem('usuarioNombre') || 'Usuario';
+        const correo = localStorage.getItem('usuarioCorreo') || 'No disponible';
+        const rol = localStorage.getItem('usuarioRol') || 'Administrador';
+
+        // Verificar si está logueado
+        if (!nombre || nombre === 'Cargando...') {
+            window.location.href = '../index.html';
+        }
+
+        // Mostrar datos (SOLO nombre, correo, rol - lo que existe en tu tabla usuario)
+        document.getElementById('perfilNombre').textContent = nombre;
+        document.getElementById('perfilCorreo').textContent = correo;
+        document.getElementById('perfilRol').textContent = rol;
+
+        // Inicial con la primera letra del nombre
+        const inicial = nombre.charAt(0).toUpperCase();
+        document.getElementById('avatarInitial').textContent = inicial;
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+
+</html>

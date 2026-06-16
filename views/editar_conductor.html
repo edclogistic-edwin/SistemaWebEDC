@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Conductor - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/style_conductor.css">
+    <link rel="stylesheet" href="../css/style_agregar_conductor.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+            <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+            <a href="#" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Editar Conductor</h1>
+
+        <div class="form-container">
+            <div class="form-box">
+                <h2>Modificar Datos</h2>
+
+                <form id="formEditarConductor">
+                    <input type="hidden" id="id_conductor">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nombres *</label>
+                            <input type="text" id="nombres" required placeholder="Ingresa los nombres">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Apellidos *</label>
+                            <input type="text" id="apellidos" required placeholder="Ingresa los apellidos">
+                        </div>
+
+                        <div class="form-group">
+                            <label>DNI *</label>
+                            <input type="text" id="dni" maxlength="8" required placeholder="8 digitos">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Telefono</label>
+                            <input type="text" id="telefono" placeholder="9 Numeros">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correo</label>
+                            <input type="email" id="correo" placeholder="ejemplo@correo.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Número de Brevete</label>
+                            <input type="text" id="numero_brevete" placeholder="BREV-12345">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fecha Inicio Contrato</label>
+                            <input type="date" id="fecha_inicio_contrato">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fecha Fin Contrato</label>
+                            <input type="date" id="fecha_fin_contrato">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                <input type="checkbox" id="estado" style="width: 20px; height: 20px; cursor: pointer;">
+                                <span style="font-weight: 600; font-size: 15px;">Estado: Activo</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group full-width foto-preview-container">
+                            <label>Foto actual:</label>
+                            <img id="fotoActual" src="" alt="Foto actual"
+                                style="width: 150px; height: 150px; object-fit: cover; border-radius: 12px; box-shadow: var(--shadow-md); border: 3px solid var(--border-color);">
+
+                            <label style="margin-top: 12px;">Cambiar foto (opcional):</label>
+                            <input type="file" id="fotoInput" accept="image/*">
+                            <img id="fotoPreview" src="" alt="Vista previa" style="display: none;">
+                            <span class="foto-hint">Deja vacio para mantener la foto actual</span>
+                        </div>
+                    </div>
+
+                    <div class="form-buttons">
+                        <a href="Vista_Conductor.html" class="btn-cancelar">Cancelar</a>
+                        <button type="submit" class="btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+
+                <div id="mensaje" class="message" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const form =
+            document.getElementById(
+                'formEditarConductor'
+            );
+
+        const mensaje =
+            document.getElementById(
+                'mensaje'
+            );
+
+        const fotoInput =
+            document.getElementById(
+                'fotoInput'
+            );
+
+        const fotoPreview =
+            document.getElementById(
+                'fotoPreview'
+            );
+
+        const fotoActual =
+            document.getElementById(
+                'fotoActual'
+            );
+
+        const estadoCheckbox =
+            document.getElementById(
+                'estado'
+            );
+
+
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const idConductor =
+            urlParams.get('id');
+
+
+        if (!idConductor) {
+
+            alert(
+                'No se encontró conductor'
+            );
+
+            window.location.href =
+                'Vista_Conductor.html';
+        }
+
+
+        // ESTADO
+        estadoCheckbox
+            .addEventListener(
+                'change',
+                (e) => {
+
+                    const label =
+                        e.target
+                            .parentElement
+                            .querySelector(
+                                'span'
+                            );
+
+                    label.textContent =
+                        e.target.checked
+                            ? 'Estado: Activo'
+                            : 'Estado: Inactivo';
+                }
+            );
+
+
+        // CARGAR CONDUCTOR
+        async function
+            cargarConductor() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        `http://localhost:3000/api/conductores/${idConductor}`
+                    );
+
+                const data =
+                    await response.json();
+
+                document
+                    .getElementById(
+                        'id_conductor'
+                    ).value =
+                    data.id_conductor;
+
+                document
+                    .getElementById(
+                        'nombres'
+                    ).value =
+                    data.nombres;
+
+                document
+                    .getElementById(
+                        'apellidos'
+                    ).value =
+                    data.apellidos;
+
+                document
+                    .getElementById(
+                        'dni'
+                    ).value =
+                    data.dni;
+
+                document
+                    .getElementById(
+                        'telefono'
+                    ).value =
+                    data.telefono || '';
+
+                document
+                    .getElementById(
+                        'correo'
+                    ).value =
+                    data.correo || '';
+
+                document
+                    .getElementById(
+                        'numero_brevete'
+                    ).value =
+                    data.numero_brevete || '';
+
+                document
+                    .getElementById(
+                        'fecha_inicio_contrato'
+                    ).value =
+                    data.fecha_inicio_contrato || '';
+
+                document
+                    .getElementById(
+                        'fecha_fin_contrato'
+                    ).value =
+                    data.fecha_fin_contrato || '';
+
+                estadoCheckbox.checked =
+                    data.estado;
+
+                const label =
+                    estadoCheckbox
+                        .parentElement
+                        .querySelector(
+                            'span'
+                        );
+
+                label.textContent =
+                    data.estado
+                        ? 'Estado: Activo'
+                        : 'Estado: Inactivo';
+
+                fotoActual.src =
+                    data.foto_url;
+
+                fotoActual.style.display =
+                    'block';
+
+            } catch (err) {
+
+                mostrarMensaje(
+                    err.message,
+                    'error'
+                );
+            }
+        }
+
+
+        // PREVIEW
+        fotoInput
+            .addEventListener(
+                'change',
+                (e) => {
+
+                    const file =
+                        e.target.files[0];
+
+                    if (!file) return;
+
+                    const reader =
+                        new FileReader();
+
+                    reader.onload =
+                        (e) => {
+
+                            fotoPreview.src =
+                                e.target.result;
+
+                            fotoPreview.style.display =
+                                'block';
+                        };
+
+                    reader.readAsDataURL(
+                        file
+                    );
+                }
+            );
+
+
+        // GUARDAR
+        form.addEventListener(
+            'submit',
+            async (e) => {
+
+                e.preventDefault();
+
+                try {
+
+                    const formData =
+                        new FormData();
+
+                    formData.append(
+                        'nombres',
+                        document.getElementById('nombres').value
+                    );
+
+                    formData.append(
+                        'apellidos',
+                        document.getElementById('apellidos').value
+                    );
+
+                    formData.append(
+                        'dni',
+                        document.getElementById('dni').value
+                    );
+
+                    formData.append(
+                        'telefono',
+                        document.getElementById('telefono').value
+                    );
+
+                    formData.append(
+                        'correo',
+                        document.getElementById('correo').value
+                    );
+
+                    formData.append(
+                        'numero_brevete',
+                        document.getElementById('numero_brevete').value
+                    );
+
+                    formData.append(
+                        'fecha_inicio_contrato',
+                        document.getElementById('fecha_inicio_contrato').value
+                    );
+
+                    formData.append(
+                        'fecha_fin_contrato',
+                        document.getElementById('fecha_fin_contrato').value
+                    );
+
+                    formData.append(
+                        'estado',
+                        estadoCheckbox.checked
+                    );
+
+                    formData.append(
+                        'foto_actual',
+                        fotoActual.src
+                    );
+
+                    const file =
+                        fotoInput.files[0];
+
+                    if (file) {
+
+                        formData.append(
+                            'foto',
+                            file
+                        );
+                    }
+
+                    const response =
+                        await fetch(
+                            `http://localhost:3000/api/conductores/${idConductor}`,
+                            {
+                                method: 'PUT',
+                                body: formData
+                            }
+                        );
+
+                    if (response.ok) {
+
+                        mostrarMensaje(
+                            'Cambios guardados con éxito',
+                            'success'
+                        );
+
+                        setTimeout(() => {
+
+                            window.location.href =
+                                'Vista_Conductor.html';
+
+                        }, 1000);
+                    }
+
+                } catch (err) {
+
+                    mostrarMensaje(
+                        err.message,
+                        'error'
+                    );
+                }
+            }
+        );
+
+
+        function mostrarMensaje(
+            texto,
+            tipo
+        ) {
+
+            mensaje.textContent =
+                texto;
+
+            mensaje.style.display =
+                'block';
+
+            mensaje.className =
+                `message ${tipo}`;
+        }
+
+
+        cargarConductor();
+
+    </script>
+    <script src="../js/dropdown.js"></script>`n
+</body>
+
+</html>

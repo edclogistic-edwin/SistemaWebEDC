@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Tracto - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/style_tracto.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+           <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>Editar Tracto</h1>
+        
+        <div class="welcome" style="max-width: 700px;">
+            <form id="formEditarTracto">
+                <div class="form-group">
+                    <label>Placa *:</label>
+                    <input type="text" id="placa" maxlength="20" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Marca:</label>
+                    <input type="text" id="marca" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Modelo:</label>
+                    <input type="text" id="modelo" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Año:</label>
+                    <input type="number" id="anio" min="1900" max="2030" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Foto actual:</label>
+                    <img id="fotoActual" src="" alt="Foto actual" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px; margin-top: 10px;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Cambiar foto (opcional):</label>
+                    <input type="file" id="fotoInput" accept="image/*" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                    <img id="fotoPreview" src="" alt="Vista previa" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px; margin-top: 10px; display: none;">
+                    <p style="font-size: 13px; color: var(--text-light); margin-top: 8px;">Deja vacío para mantener la foto actual</p>
+                </div>
+                
+                <button type="submit" class="btn-primary" style="padding: 12px 32px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px;">Guardar Cambios</button>
+            </form>
+            
+            <div id="mensaje" class="error" style="display: none; margin-top: 16px; padding: 12px; border-radius: 6px;"></div>
+        </div>
+        
+        <a href="Vista_Tracto.html" style="display: inline-block; margin-top: 24px; color: var(--primary-red); text-decoration: none; font-weight: 600;"> Volver a la lista de tractos</a>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Obtener ID del tracto desde la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const idTracto = urlParams.get('id');
+        
+        if (!idTracto) {
+            alert('ID de tracto no proporcionado');
+            window.location.href = 'Vista_Tracto.html';
+        }
+        
+        const form = document.getElementById('formEditarTracto');
+        const mensaje = document.getElementById('mensaje');
+        const fotoInput = document.getElementById('fotoInput');
+        const fotoPreview = document.getElementById('fotoPreview');
+        const fotoActual = document.getElementById('fotoActual');
+        
+        // Cargar datos del tracto
+        async function cargarTracto() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('tracto')
+                    .select('*')
+                    .eq('id_tracto', idTracto)
+                    .single();
+                
+                if (error) {
+                    throw new Error('Error al cargar tracto: ' + error.message);
+                }
+                
+                // Rellenar formulario
+                document.getElementById('placa').value = data.placa || '';
+                document.getElementById('marca').value = data.marca || '';
+                document.getElementById('modelo').value = data.modelo || '';
+                document.getElementById('anio').value = data.anio || '';
+                
+                // Mostrar foto actual
+                if (data.foto_url) {
+                    fotoActual.src = data.foto_url;
+                    fotoActual.style.display = 'block';
+                } else {
+                    fotoActual.style.display = 'none';
+                }
+                
+            } catch (err) {
+                mostrarMensaje('Error: ' + err.message, 'error');
+            }
+        }
+        
+        // Vista previa de nueva foto
+        fotoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    fotoPreview.src = e.target.result;
+                    fotoPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Guardar cambios
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            mensaje.style.display = 'none';
+            mensaje.className = 'error';
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+            
+            try {
+                let fotoUrl = null;
+                
+                // Si se seleccionó una nueva foto, subirla
+                const file = fotoInput.files[0];
+                if (file) {
+                    const fileName = `tracto_${Date.now()}_${file.name}`;
+                    const { error: uploadError } = await supabaseClient.storage
+                        .from('archivos')
+                        .upload(fileName, file);
+                    
+                    if (uploadError) {
+                        throw new Error('Error al subir imagen: ' + uploadError.message);
+                    }
+                    
+                    const { data: urlData } = supabaseClient.storage
+                        .from('archivos')
+                        .getPublicUrl(fileName);
+                    
+                    fotoUrl = urlData.publicUrl;
+                }
+                
+                // Actualizar tracto
+                const tracto = {
+                    placa: document.getElementById('placa').value,
+                    marca: document.getElementById('marca').value || null,
+                    modelo: document.getElementById('modelo').value || null,
+                    anio: document.getElementById('anio').value ? parseInt(document.getElementById('anio').value) : null,
+                    estado: true
+                };
+                
+                // Si se subió nueva foto, agregarla
+                if (fotoUrl) {
+                    tracto.foto_url = fotoUrl;
+                }
+                
+                const { error: updateError } = await supabaseClient
+                    .from('tracto')
+                    .update(tracto)
+                    .eq('id_tracto', idTracto);
+                
+                if (updateError) {
+                    throw new Error('Error al actualizar tracto: ' + updateError.message);
+                }
+                
+                mostrarMensaje('Tracto actualizado con éxito! Redirigiendo...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'Vista_Tracto.html';
+                }, 1500);
+                
+            } catch (err) {
+                mostrarMensaje('Error: ' + err.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Guardar Cambios';
+            }
+        });
+        
+        function mostrarMensaje(texto, tipo) {
+            mensaje.textContent = texto;
+            mensaje.style.display = 'block';
+            mensaje.className = tipo === 'error' ? 'error' : 'success';
+            mensaje.style.background = tipo === 'error' ? '#fee2e2' : '#d1fae5';
+            mensaje.style.color = tipo === 'error' ? '#dc2626' : '#059669';
+        }
+        
+        // Cargar datos al iniciar
+        cargarTracto();
+        
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = '../index.html';
+        });
+        
+        document.getElementById('perfilBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'Vista_Perfil.html';
+        });
+    </script>
+</body>
+</html>

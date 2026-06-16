@@ -1,0 +1,327 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+
+    <link rel="stylesheet" href="../css/style_dashboard.css?v=3">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html" class="active">Inicio</a>
+
+            <!-- Men� desplegable Administraci�n -->
+            <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+
+            <!-- Perfil -->
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+
+            <!-- Cerrar Sesi�n -->
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesion</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Panel de Control</h1>
+
+        <div class="welcome">
+            <h2>Bienvenido: <span id="usuarioNombre">Cargando...</span></h2>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <h3>Conductores</h3>
+                <p class="number" id="totalConductores">0</p>
+                <a href="Vista_Conductor.html">Ver mas</a>
+            </div>
+
+            <div class="card">
+                <h3>Tractos</h3>
+                <p class="number" id="totalTractos">0</p>
+                <a href="Vista_Tracto.html">Ver mas</a>
+            </div>
+
+            <div class="card">
+                <h3>Carretas</h3>
+                <p class="number" id="totalCarretas">0</p>
+                <a href="Vista_Carreta.html">Ver mas</a>
+            </div>
+        </div>
+
+        <div class="fecha-hora">
+            <h3>Fecha y hora</h3>
+            <p id="fechaHoraActual">Cargando...</p>
+        </div>
+
+        <div class="docs-vencimiento">
+            <div class="docs-vencimiento-header">
+                <h3>Documentos por vencer</h3>
+                <select id="filtroDocs" onchange="filtrarDocs()">
+                    <option value="">Todos</option>
+                    <option value="conductor">Conductores</option>
+                    <option value="tracto">Tractos</option>
+                    <option value="carreta">Carretas</option>
+                    <option value="empresa">Empresa</option>
+                </select>
+            </div>
+            <div id="listaDocsVencer" class="docs-vencimiento-lista"></div>
+        </div>
+    </div>
+
+   
+    <script src="../js/dropdown.js"></script>
+    <script>
+
+    // Mostrar nombre usuario
+    const usuarioNombre =
+        document.getElementById(
+            'usuarioNombre'
+        );
+
+    if (usuarioNombre) {
+
+        const nombre =
+            localStorage.getItem(
+                'usuarioNombre'
+            );
+
+        if (nombre) {
+
+            usuarioNombre.textContent =
+                nombre;
+
+        } else {
+
+            window.location.href =
+                '../index.html';
+        }
+    }
+
+    // CONTADORES
+    async function cargarContadores() {
+
+        try {
+
+            const response =
+                await fetch(
+                    'http://localhost:3000/api/dashboard/contadores'
+                );
+
+            const data =
+                await response.json();
+
+            document.getElementById(
+                'totalConductores'
+            ).textContent =
+                data.conductores || 0;
+
+            document.getElementById(
+                'totalTractos'
+            ).textContent =
+                data.tractos || 0;
+
+            document.getElementById(
+                'totalCarretas'
+            ).textContent =
+                data.carretas || 0;
+
+        } catch (err) {
+
+            console.error(
+                'Error contadores:',
+                err
+            );
+        }
+    }
+
+    cargarContadores();
+
+
+    // LOGOUT
+    const logoutBtn =
+        document.getElementById(
+            'logoutBtn'
+        );
+
+    if (logoutBtn) {
+
+        logoutBtn.addEventListener(
+            'click',
+            (e) => {
+
+                e.preventDefault();
+
+                localStorage.clear();
+
+                window.location.href =
+                    '../index.html';
+            }
+        );
+    }
+
+
+    // FECHA Y HORA
+    function actualizarFechaHora() {
+
+        const ahora =
+            new Date();
+
+        const opciones = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+
+        document.getElementById(
+            'fechaHoraActual'
+        ).textContent =
+            ahora.toLocaleDateString(
+                'es-PE',
+                opciones
+            );
+    }
+
+    actualizarFechaHora();
+
+    setInterval(
+        actualizarFechaHora,
+        1000
+    );
+
+
+    // DOCUMENTOS POR VENCER
+    let docsVencer = [];
+
+    function valorVisible(v) {
+
+        const t =
+            String(v ?? '')
+                .trim()
+                .toLowerCase();
+
+        return (
+            t &&
+            t !== 'ninguna' &&
+            t !== 'ninguno' &&
+            t !== 'ningunaaaa'
+        );
+    }
+
+    function renderDocs(lista) {
+
+        const cont =
+            document.getElementById(
+                'listaDocsVencer'
+            );
+
+        cont.innerHTML =
+            lista.map(d => `
+            <div class="doc-item">
+                <h4>${d.titulo}</h4>
+
+                ${valorVisible(d.nombre)
+                    ? `<p><strong>Conductor:</strong> ${d.nombre}</p>`
+                    : ''}
+
+                ${valorVisible(d.placa)
+                    ? `<p><strong>Placa:</strong> ${d.placa}</p>`
+                    : ''}
+
+                ${valorVisible(d.empresa)
+                    ? `<p><strong>Empresa:</strong> ${d.empresa}</p>`
+                    : ''}
+
+                ${valorVisible(d.detalle)
+                    ? `<p>${d.detalle}</p>`
+                    : ''}
+
+                ${valorVisible(d.fecha)
+                    ? `<p><strong>Vence:</strong> ${d.fecha}</p>`
+                    : ''}
+            </div>
+        `).join('');
+    }
+
+    async function cargarDocsVencer() {
+
+        try {
+
+            const response =
+                await fetch(
+                    'http://localhost:3000/api/dashboard/documentos'
+                );
+
+            docsVencer =
+                await response.json();
+
+            renderDocs(
+                docsVencer
+            );
+
+        } catch (err) {
+
+            console.error(
+                'Error documentos:',
+                err
+            );
+        }
+    }
+
+    function filtrarDocs() {
+
+        const filtro =
+            document.getElementById(
+                'filtroDocs'
+            ).value;
+
+        const filtrados =
+            filtro
+                ? docsVencer.filter(
+                    d => d.tipo === filtro
+                )
+                : docsVencer;
+
+        renderDocs(
+            filtrados
+        );
+    }
+
+    cargarDocsVencer();
+
+</script>
+</body>
+
+</html>

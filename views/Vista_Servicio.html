@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios - Sistema E&DC</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../css/style_dashboard.css">
+    <link rel="stylesheet" href="../css/Vista_Servicio.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="../img/logo.png.png" alt="Logo Sistema E&DC" class="nav-logo">
+        </div>
+        <div class="nav-menu">
+            <a href="dashboard.html">Inicio</a>
+
+           <div class="dropdown">
+                <button class="dropbtn">Administracion </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Conductor.html">Conductores</a>
+                    <a href="Vista_Tracto.html" class="active">Tractos</a>
+                    <a href="Vista_Carreta.html">Carretas</a>
+                    <a href="Vista_Proveedor.html" class="active">Proveedores</a>
+                    <a href="Vista_TipoDoc.html">Tipos de Documento</a>
+                    <a href="Vista_Conductor_Doc.html">Documentos Conductor</a>
+                    <a href="Vista_Tracto_Doc.html">Documentos Tracto</a>
+                    <a href="Vista_Carreta_Doc.html">Documentos Carreta</a>
+                    <a href="Vista_Empresa_Doc.html">Documentos Empresa</a>
+
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Gestion de Servicios </button>
+                <div class="dropdown-content">
+                    <a href="Vista_Servicio.html">Servicios</a>
+                    <a href="Vista_Tarifa.html">Tarifas</a>
+                </div>
+            </div>
+
+            <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
+            <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Servicios</h1>
+
+        <a href="agregar_servicio.html">
+            <button class="btn-agregar">Agregar Servicio</button>
+        </a>
+
+        <!-- BUSCADOR AGREGADO -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+            <input type="text" id="buscadorContenedor" placeholder="Buscar por número de contenedor..."
+                style="padding: 10px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; width: 300px;" />
+            <button onclick="buscarContenedor()"
+                style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                Buscar
+            </button>
+            <button onclick="refreshServicios()"
+                style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                Refrescar
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>FECHA</th>
+                        <th>CHOFER</th>
+                        <th>CONTENEDOR</th>
+                        <th>PLACA CARRETA</th>
+                        <th>AGENCIA</th>
+                        <th>CLIENTE</th>
+                        <th>CONTACTO</th>
+                        <th>1X20-40</th>
+                        <th>IMO-GENERAL</th>
+                        <th>FACTURA</th>
+                        <th>SALIDA</th>
+                        <th>LLEGADA</th>
+                        <th>NUMERO GUIA DE REMISION</th>
+                        <th>NUMERO GUIA DE TRANSPORTE</th>
+                        <th>VIGENCIA</th>
+                        <th>OBSERVACIONES 1</th>
+                        <th>OBSERVACIONES 2</th>
+                        <th>HORA</th>
+                        <th>FECHA ENTREGA</th>
+                        <th>CONDUCTOR</th>
+                        <th>ENTREGA DE CONTENEDOR</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaServicios">
+                    <tr>
+                        <td colspan="22">Cargando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINACI�"N AGREGADA -->
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+            <div id="infoPaginacion" style="font-size: 14px; color: #666;">
+                Mostrando 0 de 0 registros
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="btnAnterior" onclick="paginarAnterior()"
+                    style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                    Anterior
+                </button>
+                <span id="numeroPagina" style="padding: 8px 16px; font-weight: 600; font-size: 14px;">
+                    Página 1
+                </span>
+                <button id="btnSiguiente" onclick="paginarSiguiente()"
+                    style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                    Siguiente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/dropdown.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // VARIABLES PARA PAGINACI�"N Y B�sSQUEDA AGREGADAS
+        let todosLosServicios = [];
+        let paginaActual = 1;
+        const registrosPorPagina = 30;
+        let terminoBusqueda = '';
+
+        async function cargarServicios() {
+            const tbody = document.getElementById('tablaServicios');
+
+            // 1. Cargar servicios (NO tiene JOIN)
+            const { data: servicios, error } = await supabaseClient
+                .from('servicio')
+                .select('id_servicio, fecha_servicio, hora, id_conductor, id_carreta, contenedor, agencia, cliente, contacto, tipo_contenedor, tipo_carga, factura, punto_salida, punto_llegada, numero_guia_remision, numero_guia_transporte, vigencia, fecha_entrega, entrega_contenedor, observacion_1, observacion_2')
+                .order('id_servicio', { ascending: false });
+
+            if (error) {
+                console.error('Error cargando servicios:', error);
+                tbody.innerHTML = '<tr><td colspan="22" style="text-align: center; padding: 40px; color: red;">Error: ' + error.message + '</td></tr>';
+                return;
+            }
+
+            todosLosServicios = servicios || [];
+
+            if (todosLosServicios.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="22">No hay servicios registrados</td></tr>';
+                actualizarInfoPaginacion();
+                return;
+            }
+
+            // 2. Cargar conductores (consulta separada)
+            const conductorIds = [...new Set(todosLosServicios.map(s => s.id_conductor))].filter(id => id !== null);
+            const conductoresMap = {};
+
+            if (conductorIds.length > 0) {
+                const { data: conductores } = await supabaseClient
+                    .from('conductor')
+                    .select('id_conductor, nombres, apellidos')
+                    .in('id_conductor', conductorIds);
+
+                conductores?.forEach(c => conductoresMap[c.id_conductor] = c);
+            }
+
+            // 3. Cargar carretas (consulta separada)
+            const carretaIds = [...new Set(todosLosServicios.map(s => s.id_carreta))].filter(id => id !== null);
+            const carretasMap = {};
+
+            if (carretaIds.length > 0) {
+                const { data: carretas } = await supabaseClient
+                    .from('carreta')
+                    .select('id_carreta, placa')
+                    .in('id_carreta', carretaIds);
+
+                carretas?.forEach(c => carretasMap[c.id_carreta] = c);
+            }
+
+            // 4. Filtrar por búsqueda
+            const serviciosFiltrados = terminoBusqueda
+                ? todosLosServicios.filter(s =>
+                    s.contenedor?.toLowerCase().includes(terminoBusqueda.toLowerCase())
+                )
+                : todosLosServicios;
+
+            // 5. Paginar
+            const inicio = (paginaActual - 1) * registrosPorPagina;
+            const serviciosPagina = serviciosFiltrados.slice(inicio, inicio + registrosPorPagina);
+
+            // 6. Generar tabla (ORDEN CORREGIDO)
+            tbody.innerHTML = serviciosPagina.map(s => {
+                const conductor = conductoresMap[s.id_conductor];
+                const carreta = carretasMap[s.id_carreta];
+
+                const choferNombre = conductor
+                    ? conductor.nombres + ' ' + conductor.apellidos
+                    : s.id_conductor ? 'Chofer ' + s.id_conductor : 'No asignado';
+
+                const placaCarreta = carreta
+                    ? carreta.placa
+                    : s.id_carreta ? 'Carreta ' + s.id_carreta : 'No asignada';
+
+                return `<tr>
+        <td>${s.fecha_servicio ? s.fecha_servicio.slice(0, 10) : '-'}</td>
+        <td>${choferNombre}</td>
+        <td>${s.contenedor || '-'}</td>
+        <td>${placaCarreta}</td>
+        <td>${s.agencia || '-'}</td>
+        <td>${s.cliente || '-'}</td>
+        <td>${s.contacto || '-'}</td>
+        <td>${s.tipo_contenedor || '-'}</td>
+        <td>${s.tipo_carga || '-'}</td>
+        <td>${s.factura || '-'}</td>
+        <td>${s.punto_salida || '-'}</td>
+        <td>${s.punto_llegada || '-'}</td>
+        <td>${s.numero_guia_remision || '-'}</td>
+        <td>${s.numero_guia_transporte || '-'}</td>
+        <td>${s.vigencia ? s.vigencia.slice(0, 10) : '-'}</td>
+        <td>${s.observacion_1 || '-'}</td>
+        <td>${s.observacion_2 || '-'}</td>
+        <td>${s.hora || '-'}</td>
+        <td>${s.fecha_entrega ? s.fecha_entrega.slice(0, 10) : '-'}</td>
+        <td>${choferNombre}</td>
+        <td>${s.entrega_contenedor || '-'}</td>
+        <td>
+            <a href="editar_servicio.html?id=${s.id_servicio}" style="color: #007bff; text-decoration: none; font-weight: 600; margin-right: 8px;">Editar</a>
+            <button onclick="eliminarServicio(${s.id_servicio})" style="padding: 6px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">Eliminar</button>
+        </td>
+    </tr>`;
+            }).join('');
+
+            actualizarInfoPaginacion(serviciosFiltrados.length);
+        }
+
+        // FUNCI�"N BUSCADOR AGREGADA
+        function buscarContenedor() {
+            terminoBusqueda = document.getElementById('buscadorContenedor').value;
+            paginaActual = 1;
+            cargarServicios();
+        }
+
+        // FUNCI�"N REFRESCAR AGREGADA
+        function refreshServicios() {
+            document.getElementById('buscadorContenedor').value = '';
+            terminoBusqueda = '';
+            paginaActual = 1;
+            cargarServicios();
+        }
+
+        // FUNCIONES PAGINACI�"N AGREGADAS
+        function actualizarInfoPaginacion(total = null) {
+            const totalRegistros = total !== null ? total : todosLosServicios.length;
+            const desde = (paginaActual - 1) * registrosPorPagina + 1;
+            const hasta = Math.min(paginaActual * registrosPorPagina, totalRegistros);
+            const totalPaginas = Math.ceil(totalRegistros / registrosPorPagina);
+
+            document.getElementById('infoPaginacion').textContent =
+                'Mostrando ' + desde + ' - ' + hasta + ' de ' + totalRegistros + ' registros';
+
+            document.getElementById('numeroPagina').textContent =
+                'Página ' + paginaActual + ' de ' + Math.max(totalPaginas, 1);
+
+            document.getElementById('btnAnterior').disabled = paginaActual === 1;
+            document.getElementById('btnSiguiente').disabled = paginaActual >= totalPaginas || totalRegistros === 0;
+        }
+
+        function paginarAnterior() {
+            if (paginaActual > 1) {
+                paginaActual--;
+                cargarServicios();
+            }
+        }
+
+        function paginarSiguiente() {
+            const totalRegistros = terminoBusqueda
+                ? todosLosServicios.filter(s => s.contenedor?.toLowerCase().includes(terminoBusqueda.toLowerCase())).length
+                : todosLosServicios.length;
+            const totalPaginas = Math.ceil(totalRegistros / registrosPorPagina);
+
+            if (paginaActual < totalPaginas) {
+                paginaActual++;
+                cargarServicios();
+            }
+        }
+
+        // FUNCI�"N EDITAR AGREGADA
+        function editarServicio(idServicio) {
+            alert('Editar servicio ID: ' + idServicio);
+            // window.location.href = 'editar_servicio.html?id=' + idServicio;
+        }
+
+        // FUNCI�"N ELIMINAR AGREGADA
+        function eliminarServicio(idServicio) {
+            const confirmacion = confirm('¿Estás seguro de que deseas eliminar este servicio? Esta acción no se puede revertir.');
+
+            if (confirmacion) {
+                supabaseClient
+                    .from('servicio')
+                    .delete()
+                    .eq('id_servicio', idServicio)
+                    .then(({ error }) => {
+                        if (error) {
+                            alert('Error eliminando servicio: ' + error.message);
+                            console.error('Error:', error);
+                        } else {
+                            alert('Servicio eliminado correctamente');
+                            cargarServicios();
+                        }
+                    });
+            }
+        }
+
+        // EVENTO ENTER EN BUSCADOR AGREGADO
+        document.getElementById('buscadorContenedor')?.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                buscarContenedor();
+            }
+        });
+
+        cargarServicios();
+    </script>
+</body>
+
+</html>
