@@ -14,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(express.static(path.join(__dirname)));
 
 
 const BASE_URL =
@@ -47,6 +48,7 @@ const pool = new Pool({
 app.get("/", (req, res) => {
     res.sendFile(path.resolve(__dirname, "index.html"));
 });
+
 app.post("/api/login", async (req, res) => {
     try {
         const { correo, password } = req.body;
