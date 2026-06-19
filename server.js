@@ -355,8 +355,8 @@ app.post(
                         filePath
                     );
 
-                fotoUrl =
-                    `http://localhost:3000/uploads/conductores/${fileName}`;
+              fotoUrl =
+`${BASE_URL}/uploads/conductores/${fileName}`;
             }
 
             const {
