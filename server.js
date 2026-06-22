@@ -1595,6 +1595,149 @@ app.post(
         }
     }
 );
+
+// ==========================
+// OBTENER TRACTO POR ID
+// ==========================
+app.get(
+    '/api/tractos/:id',
+    async (req, res) => {
+
+        try {
+
+            const { id } = req.params;
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT *
+                    FROM tracto
+                    WHERE id_tracto = $1
+                    `,
+                    [id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        'Tracto no encontrado'
+                });
+            }
+
+            res.json(
+                result.rows[0]
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);// ==========================
+// EDITAR TRACTO
+// ==========================
+app.put(
+    '/api/tractos/:id',
+    uploadTractos.single('foto'),
+    async (req, res) => {
+
+        try {
+
+            const { id } =
+                req.params;
+
+            let fotoUrl =
+                req.body.foto_actual;
+
+            // NUEVA FOTO
+            if (req.file) {
+
+                const fileName =
+                    `tracto_${Date.now()}.webp`;
+
+                const filePath =
+                    path.join(
+                        __dirname,
+                        'uploads',
+                        'tractos',
+                        fileName
+                    );
+
+                await sharp(
+                    req.file.buffer
+                )
+                    .resize({
+                        width: 900,
+                        withoutEnlargement: true
+                    })
+                    .webp({
+                        quality: 75
+                    })
+                    .toFile(
+                        filePath
+                    );
+
+                fotoUrl =
+                    `${BASE_URL}/uploads/tractos/${fileName}`;
+            }
+
+            const {
+                placa,
+                marca,
+                modelo,
+                anio
+            } = req.body;
+
+            const result =
+                await pool.query(
+                    `
+                    UPDATE tracto
+                    SET
+                        placa = $1,
+                        marca = $2,
+                        modelo = $3,
+                        anio = $4,
+                        foto_url = $5
+                    WHERE id_tracto = $6
+                    RETURNING *
+                    `,
+                    [
+                        placa,
+                        marca || null,
+                        modelo || null,
+                        anio || null,
+                        fotoUrl,
+                        id
+                    ]
+                );
+
+            res.json({
+                success: true,
+                tracto:
+                    result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================
