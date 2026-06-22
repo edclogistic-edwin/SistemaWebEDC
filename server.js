@@ -1748,7 +1748,7 @@ app.get('/api/carretas', async (req, res) => {
         const result = await pool.query(`
             SELECT
                 c.id_carreta,
-                c.foto_url,
+              
                 c.placa,
                 c.tipo,
                 c.id_tracto,
@@ -1815,6 +1815,64 @@ app.put(
             res.status(500).json({
                 success: false,
                 message: error.message
+            });
+        }
+    }
+);
+
+
+// ==========================
+// AGREGAR CARRETA
+// ==========================
+app.post(
+    '/api/carretas',
+    async (req, res) => {
+
+        try {
+
+            const {
+                placa,
+                tipo,
+                id_tracto
+            } = req.body;
+
+            const result =
+                await pool.query(
+                    `
+                    INSERT INTO carreta
+                    (
+                        placa,
+                        tipo,
+                        id_tracto,
+                        estado
+                    )
+                    VALUES
+                    (
+                        $1,$2,$3,true
+                    )
+                    RETURNING *
+                    `,
+                    [
+                        placa,
+                        tipo || null,
+                        id_tracto || null
+                    ]
+                );
+
+            res.json({
+                success: true,
+                carreta:
+                    result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
             });
         }
     }

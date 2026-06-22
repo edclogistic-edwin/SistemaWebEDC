@@ -168,22 +168,6 @@
                 
                 <td>${c.id_carreta}</td>
 
-                <td>
-                    ${
-                        c.foto_url
-                        ? `<img
-                                src="${c.foto_url}"
-                                style="
-                                    width:60px;
-                                    height:40px;
-                                    object-fit:cover;
-                                    border-radius:4px;
-                                "
-                          >`
-                        : 'Sin foto'
-                    }
-                </td>
-
                 <td>${c.placa}</td>
 
                 <td>${c.tipo || '-'}</td>

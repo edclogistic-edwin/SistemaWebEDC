@@ -84,112 +84,247 @@
             Volver a la lista de carretas</a>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const form = document.getElementById('formAgregarCarreta');
-        const mensaje = document.getElementById('mensaje');
-        const idTractoSelect = document.getElementById('id_tracto');
-        const tractoLoading = document.getElementById('tractoLoading');
+const form =
+    document.getElementById(
+        'formAgregarCarreta'
+    );
 
-        // Cargar tractos desde la BD (AUTOMÁTICO)
-        async function cargarTractos() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('tracto')
-                    .select('*')
-                    .eq('estado', true);
+const mensaje =
+    document.getElementById(
+        'mensaje'
+    );
 
-                if (error) {
-                    throw new Error('Error al cargar tractos: ' + error.message);
-                }
+const idTractoSelect =
+    document.getElementById(
+        'id_tracto'
+    );
 
-                tractoLoading.style.display = 'none';
+const tractoLoading =
+    document.getElementById(
+        'tractoLoading'
+    );
 
-                if (data.length === 0) {
-                    idTractoSelect.innerHTML = '<option value="">No hay tractos disponibles</option>';
-                    return;
-                }
+// ==========================
+// CARGAR TRACTOS
+// ==========================
+async function cargarTractos() {
 
-                // Rellenar dropdown con todos los tractos
-                data.forEach(tracto => {
-                    const option = document.createElement('option');
-                    option.value = tracto.id_tracto;
-                    option.textContent = `${tracto.placa} - ${tracto.marca || 'Sin marca'} (Año: ${tracto.anio || 'Sin año'})`;
-                    idTractoSelect.appendChild(option);
-                });
+    try {
 
-            } catch (err) {
-                mostrarMensaje('Error: ' + err.message, 'error');
-                tractoLoading.style.display = 'none';
-            }
+        const response =
+            await fetch(
+                '/api/tractos-activos'
+            );
+
+        const data =
+            await response.json();
+
+        tractoLoading.style.display =
+            'none';
+
+        if (data.length === 0) {
+
+            idTractoSelect.innerHTML =
+                '<option value="">No hay tractos disponibles</option>';
+
+            return;
         }
 
-        // Guardar carreta
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            mensaje.style.display = 'none';
-            mensaje.className = 'error';
+        data.forEach(
+            tracto => {
 
-            const submitBtn = form.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Guardando...';
+                const option =
+                    document.createElement(
+                        'option'
+                    );
 
-            try {
-                const carreta = {
-                    placa: document.getElementById('placa').value,
-                    tipo: document.getElementById('tipo').value || null,
-                    id_tracto: parseInt(document.getElementById('id_tracto').value),
-                    estado: true
-                };
+                option.value =
+                    tracto.id_tracto;
 
-                const { data: carretaData, error: insertError } = await supabaseClient
-                    .from('carreta')
-                    .insert([carreta])
-                    .select();
+                option.textContent =
+                    `${tracto.placa} - ${tracto.marca || 'Sin marca'} (Año: ${tracto.anio || 'Sin año'})`;
 
-                if (insertError) {
-                    throw new Error('Error al guardar carreta: ' + insertError.message);
-                }
-
-                mostrarMensaje('Carreta guardada con éxito! Redirigiendo...', 'success');
-
-                setTimeout(() => {
-                    window.location.href = 'Vista_Carreta.html';
-                }, 1500);
-
-            } catch (err) {
-                mostrarMensaje('Error: ' + err.message, 'error');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Guardar Carreta';
+                idTractoSelect.appendChild(
+                    option
+                );
             }
-        });
+        );
 
-        function mostrarMensaje(texto, tipo) {
-            mensaje.textContent = texto;
-            mensaje.style.display = 'block';
-            mensaje.className = tipo === 'error' ? 'error' : 'success';
-            mensaje.style.background = tipo === 'error' ? '#fee2e2' : '#d1fae5';
-            mensaje.style.color = tipo === 'error' ? '#dc2626' : '#059669';
+    } catch (err) {
+
+        mostrarMensaje(
+            err.message,
+            'error'
+        );
+
+        tractoLoading.style.display =
+            'none';
+    }
+}
+
+// ==========================
+// GUARDAR CARRETA
+// ==========================
+form.addEventListener(
+    'submit',
+    async (e) => {
+
+        e.preventDefault();
+
+        mensaje.style.display =
+            'none';
+
+        const submitBtn =
+            form.querySelector(
+                'button[type="submit"]'
+            );
+
+        submitBtn.disabled =
+            true;
+
+        submitBtn.textContent =
+            'Guardando...';
+
+        try {
+
+            const response =
+                await fetch(
+                    '/api/carretas',
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json'
+                        },
+
+                        body:
+                            JSON.stringify({
+                                placa:
+                                    document.getElementById(
+                                        'placa'
+                                    ).value,
+
+                                tipo:
+                                    document.getElementById(
+                                        'tipo'
+                                    ).value || null,
+
+                                id_tracto:
+                                    document.getElementById(
+                                        'id_tracto'
+                                    ).value || null
+                            })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message
+                );
+            }
+
+            mostrarMensaje(
+                'Carreta guardada correctamente',
+                'success'
+            );
+
+            setTimeout(
+                () => {
+
+                    window.location.href =
+                        'Vista_Carreta.html';
+
+                },
+                1500
+            );
+
+        } catch (err) {
+
+            mostrarMensaje(
+                err.message,
+                'error'
+            );
+
+            submitBtn.disabled =
+                false;
+
+            submitBtn.textContent =
+                'Guardar Carreta';
         }
+    }
+);
 
-        // Cargar tractos al iniciar
-        cargarTractos();
+// ==========================
+// MENSAJES
+// ==========================
+function mostrarMensaje(
+    texto,
+    tipo
+) {
 
-        document.getElementById('logoutBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.clear();
-            window.location.href = '../index.html';
-        });
+    mensaje.textContent =
+        texto;
 
-        document.getElementById('perfilBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = 'Vista_Perfil.html';
-        });
-    </script>
+    mensaje.style.display =
+        'block';
+
+    mensaje.className =
+        tipo === 'error'
+            ? 'error'
+            : 'success';
+
+    mensaje.style.background =
+        tipo === 'error'
+            ? '#fee2e2'
+            : '#d1fae5';
+
+    mensaje.style.color =
+        tipo === 'error'
+            ? '#dc2626'
+            : '#059669';
+}
+
+// ==========================
+// INICIO
+// ==========================
+cargarTractos();
+
+document.getElementById(
+    'logoutBtn'
+).addEventListener(
+    'click',
+    (e) => {
+
+        e.preventDefault();
+
+        localStorage.clear();
+
+        window.location.href =
+            '../index.html';
+    }
+);
+
+document.getElementById(
+    'perfilBtn'
+).addEventListener(
+    'click',
+    (e) => {
+
+        e.preventDefault();
+
+        window.location.href =
+            'Vista_Perfil.html';
+    }
+);
+
+</script>
 </body>
 
 </html>
