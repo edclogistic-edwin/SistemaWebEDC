@@ -85,14 +85,16 @@
             <div style="margin-bottom: 20px;">
                 <label for="fechaEmision" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha Emisión
                     *</label>
-               <input type="date" id="fechaEmision" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <input type="date" id="fechaEmision"
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
             </div>
 
             <!-- Fecha Vencimiento -->
             <div style="margin-bottom: 20px;">
                 <label for="fechaVencimiento" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha
                     Vencimiento</label>
-                <input type="date" id="fechaVencimiento" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <input type="date" id="fechaVencimiento"
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
                 <small style="color: #666; margin-top: 4px; display: block;">Opcional si el tipo de documento no
                     requiere vencimiento</small>
             </div>
@@ -133,9 +135,9 @@
         </form>
     </div>
 
-     <script src="../js/dropdown.js"></script>
+    <script src="../js/dropdown.js"></script>
     <script>
-         
+
 
         let idDocumentoEdit = null;
         let tractosData = [];
@@ -162,49 +164,50 @@
             const urlParams = new URLSearchParams(window.location.search);
             idDocumentoEdit = urlParams.get('id');
 
+            // ✅ Si no hay ID, es "Agregar Nuevo"
             if (!idDocumentoEdit) {
-                alert('Error: No se especificó el ID del documento');
-                window.location.href = 'Vista_Tracto_Doc.html';
+                console.log('Modo: Agregar Nuevo');
+                // No falla, solo continua
                 return;
             }
 
             document.getElementById('idDocumento').value = idDocumentoEdit;
         }
-async function cargarTractos() {
-    try {
-        const response = await fetch('/api/tractos-activos');  // ✅ URL relativa
-        const tractosData = await response.json();
+        async function cargarTractos() {
+            try {
+                const response = await fetch('/api/tractos-activos');  // ✅ URL relativa
+                const tractosData = await response.json();
 
-        const select = document.getElementById('idTracto');
+                const select = document.getElementById('idTracto');
 
-        tractosData.forEach(tracto => {
-            const option = document.createElement('option');
-            option.value = tracto.id_tracto;
-            option.textContent = `${tracto.placa} - ${tracto.marca || ''} ${tracto.modelo || ''}`.trim();
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error al cargar tractos:', error);
-    }
-}
+                tractosData.forEach(tracto => {
+                    const option = document.createElement('option');
+                    option.value = tracto.id_tracto;
+                    option.textContent = `${tracto.placa} - ${tracto.marca || ''} ${tracto.modelo || ''}`.trim();
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error al cargar tractos:', error);
+            }
+        }
 
-async function cargarTiposDocumento() {
-    try {
-        const response = await fetch('/api/tipos-documento-tracto');  // ✅ URL relativa
-        const tiposData = await response.json();
+        async function cargarTiposDocumento() {
+            try {
+                const response = await fetch('/api/tipos-documento-tracto');  // ✅ URL relativa
+                const tiposData = await response.json();
 
-        const select = document.getElementById('idTipoDocumento');
+                const select = document.getElementById('idTipoDocumento');
 
-        tiposData.forEach(tipo => {
-            const option = document.createElement('option');
-            option.value = tipo.id_tipo_documento;
-            option.textContent = tipo.nombre;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error al cargar tipos de documento:', error);
-    }
-}
+                tiposData.forEach(tipo => {
+                    const option = document.createElement('option');
+                    option.value = tipo.id_tipo_documento;
+                    option.textContent = tipo.nombre;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error al cargar tipos de documento:', error);
+            }
+        }
         async function cargarDocumento() {
 
             const response =
@@ -276,90 +279,49 @@ async function cargarTiposDocumento() {
         }
 
         async function guardarDocumento(e) {
-
             e.preventDefault();
 
-            const formData =
-                new FormData();
+            const formData = new FormData();
 
-            formData.append(
-                'id_tracto',
-                document.getElementById(
-                    'idTracto'
-                ).value
-            );
+            formData.append('id_tracto', document.getElementById('idTracto').value);
+            formData.append('id_tipo_documento', document.getElementById('idTipoDocumento').value);
+            formData.append('fecha_emision', document.getElementById('fechaEmision').value);
+            formData.append('fecha_vencimiento', document.getElementById('fechaVencimiento').value);
+            formData.append('observacion', document.getElementById('observacion').value);
+            formData.append('archivo_actual', documentoActual.archivo_url || '');
 
-            formData.append(
-                'id_tipo_documento',
-                document.getElementById(
-                    'idTipoDocumento'
-                ).value
-            );
-
-            formData.append(
-                'fecha_emision',
-                document.getElementById(
-                    'fechaEmision'
-                ).value
-            );
-
-            formData.append(
-                'fecha_vencimiento',
-                document.getElementById(
-                    'fechaVencimiento'
-                ).value
-            );
-
-            formData.append(
-                'observacion',
-                document.getElementById(
-                    'observacion'
-                ).value
-            );
-
-            formData.append(
-                'archivo_actual',
-                documentoActual.archivo_url || ''
-            );
-
-            const archivoNuevo =
-                document.getElementById(
-                    'archivoNuevo'
-                ).files[0];
-
+            const archivoNuevo = document.getElementById('archivoNuevo').files[0];
             if (archivoNuevo) {
-
-                formData.append(
-                    'archivo',
-                    archivoNuevo
-                );
+                formData.append('archivo', archivoNuevo);
             }
 
-            const response =
-                await fetch(
-                    `/api/documentos-tracto/${idDocumentoEdit}`,
-                    {
-                        method: 'PUT',
-                        body: formData
-                    }
-                );
+            // ✅ CORRECCIÓN: Detecta si es CREAR (POST) o ACTUALIZAR (PUT)
+            let url, method;
 
-            const data =
-                await response.json();
+            if (idDocumentoEdit && idDocumentoEdit !== '') {
+                // ACTUALIZAR (tiene ID)
+                url = `/api/documentos-tracto/${idDocumentoEdit}`;
+                method = 'PUT';
+            } else {
+                // CREAR (NO tiene ID)
+                url = '/api/documentos-tracto';
+                method = 'POST';
+            }
+
+            const response = await fetch(url, {
+                method: method,
+                body: formData
+            });
+
+            const data = await response.json();
 
             if (!response.ok) {
-
                 alert(data.message);
-
                 return;
             }
 
-            alert(
-                'Documento actualizado correctamente'
-            );
-
-            window.location.href =
-                'Vista_Tracto_Doc.html';
+            alert(method === 'POST' ? 'Documento agregado correctamente' : 'Documento actualizado correctamente');
+            window.location.href = 'Vista_Tracto_Doc.html';
         }
         document.getElementById('formularioDocumento').addEventListener('submit', guardarDocumento);
 
