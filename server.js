@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 
 const express = require("express");
@@ -16,37 +15,87 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname)));
 
-
 const BASE_URL =
     process.env.BASE_URL ||
     `http://localhost:${process.env.PORT || 3000}`;
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use(
+    "/uploads",
+    express.static(
+        path.join(__dirname, "uploads")
+    )
+);
 
-const storageDocumentos = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/documentos');
-    },
-    filename: (req, file, cb) => {
-        cb(null, `doc_${Date.now()}_${file.originalname}`);
-    }
-});
+// ==========================
+// DOCUMENTOS CONDUCTOR
+// ==========================
+const storageDocumentos =
+    multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(
+                null,
+                "uploads/documentos"
+            );
+        },
+        filename: (req, file, cb) => {
+            cb(
+                null,
+                `doc_${Date.now()}_${file.originalname}`
+            );
+        }
+    });
 
-const uploadDocumentos = multer({ storage: storageDocumentos });
+const uploadDocumentos =
+    multer({
+        storage: storageDocumentos
+    });
 
+// ==========================
+// DOCUMENTOS TRACTO
+// ==========================
+const storageDocumentosTracto =
+    multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(
+                null,
+                "uploads/documentos_tracto"
+            );
+        },
+        filename: (req, file, cb) => {
+            cb(
+                null,
+                `tracto_${Date.now()}_${file.originalname}`
+            );
+        }
+    });
 
+const uploadDocumentosTracto =
+    multer({
+        storage: storageDocumentosTracto
+    });
 
+// ==========================
+// CONEXIÓN POSTGRES
+// ==========================
 const pool = new Pool({
     connectionString:
         process.env.DATABASE_URL,
 
     ssl: {
-        rejectUnauthorized:
-            false
+        rejectUnauthorized: false
     }
 });
+
+// ==========================
+// INDEX
+// ==========================
 app.get("/", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "index.html"));
+    res.sendFile(
+        path.resolve(
+            __dirname,
+            "index.html"
+        )
+    );
 });
 
 app.post("/api/login", async (req, res) => {
@@ -1280,6 +1329,97 @@ app.get('/api/tractos-activos', async (req, res) => {
         });
     }
 });
+
+const storagePdfTracto = multer.diskStorage({
+
+    destination: (req, file, cb) => {
+
+        cb(
+            null,
+            'uploads/documentos_tracto'
+        );
+    },
+
+    filename: (req, file, cb) => {
+
+        cb(
+            null,
+            `tracto_${Date.now()}_${file.originalname}`
+        );
+    }
+});
+
+const uploadPdfTracto =
+    multer({
+        storage: storagePdfTracto
+    });
+    // ==========================
+// AGREGAR DOCUMENTO TRACTO
+// ==========================
+app.post(
+    '/api/documentos-tracto',
+    uploadPdfTracto.single('archivo'),
+    async (req, res) => {
+
+        try {
+
+            let archivoUrl = null;
+
+            if (req.file) {
+
+                archivoUrl =
+                    `${BASE_URL}/uploads/documentos_tracto/${req.file.filename}`;
+            }
+
+            const {
+                id_tracto,
+                id_tipo_documento,
+                fecha_emision,
+                fecha_vencimiento,
+                observacion
+            } = req.body;
+
+            const result =
+                await pool.query(`
+                    INSERT INTO documento_tracto (
+                        id_tracto,
+                        id_tipo_documento,
+                        archivo_url,
+                        fecha_emision,
+                        fecha_vencimiento,
+                        observacion
+                    )
+                    VALUES (
+                        $1,$2,$3,$4,$5,$6
+                    )
+                    RETURNING *
+                `,
+                    [
+                        id_tracto,
+                        id_tipo_documento,
+                        archivoUrl,
+                        fecha_emision,
+                        fecha_vencimiento || null,
+                        observacion || null
+                    ]
+                );
+
+            res.json({
+                success: true,
+                documento: result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message: error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================
