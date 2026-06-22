@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="../css/style_dashboard.css">
     <link rel="stylesheet" href="../css/style_conductor_doc.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="nav-brand">
@@ -15,8 +17,8 @@
         </div>
         <div class="nav-menu">
             <a href="dashboard.html">Inicio</a>
-            
-           <div class="dropdown">
+
+            <div class="dropdown">
                 <button class="dropbtn">Administracion </button>
                 <div class="dropdown-content">
                     <a href="Vista_Conductor.html">Conductores</a>
@@ -38,137 +40,158 @@
                     <a href="Vista_Tarifa.html">Tarifas</a>
                 </div>
             </div>
-            
+
             <a href="Vista_Perfil.html" id="perfilBtn" class="nav-link">Perfil</a>
             <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
         </div>
     </nav>
-    
+
     <div class="container">
         <h1>Editar Documento del Tracto</h1>
-        
+
         <div id="cargando" style="text-align: center; padding: 40px; font-size: 18px; color: #666;">
             Cargando datos del documento...
         </div>
-        
+
         <form id="formularioDocumento" style="display: none;">
             <!-- ID (solo lectura) -->
             <div style="margin-bottom: 20px;">
-                <label for="idDocumento" style="display: block; margin-bottom: 8px; font-weight: 600;">ID Documento</label>
-                <input type="text" id="idDocumento" readonly style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #f5f5f5;">
+                <label for="idDocumento" style="display: block; margin-bottom: 8px; font-weight: 600;">ID
+                    Documento</label>
+                <input type="text" id="idDocumento" readonly
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #f5f5f5;">
             </div>
-            
+
             <!-- Tracto -->
             <div style="margin-bottom: 20px;">
                 <label for="idTracto" style="display: block; margin-bottom: 8px; font-weight: 600;">Tracto *</label>
-                <select id="idTracto" required style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <select id="idTracto" required
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
                     <option value="">Seleccionar tracto...</option>
                 </select>
             </div>
-            
+
             <!-- Tipo de Documento -->
             <div style="margin-bottom: 20px;">
-                <label for="idTipoDocumento" style="display: block; margin-bottom: 8px; font-weight: 600;">Tipo de Documento *</label>
-                <select id="idTipoDocumento" required style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <label for="idTipoDocumento" style="display: block; margin-bottom: 8px; font-weight: 600;">Tipo de
+                    Documento *</label>
+                <select id="idTipoDocumento" required
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
                     <option value="">Seleccionar tipo de documento...</option>
                 </select>
             </div>
-            
+
             <!-- Fecha Emisión -->
             <div style="margin-bottom: 20px;">
-                <label for="fechaEmision" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha Emisión *</label>
-                <input type="date" id="fechaEmision" required style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <label for="fechaEmision" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha Emisión
+                    *</label>
+                <input type="date" id="fechaEmision" required
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
             </div>
-            
+
             <!-- Fecha Vencimiento -->
             <div style="margin-bottom: 20px;">
-                <label for="fechaVencimiento" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha Vencimiento</label>
-                <input type="date" id="fechaVencimiento" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
-                <small style="color: #666; margin-top: 4px; display: block;">Opcional si el tipo de documento no requiere vencimiento</small>
+                <label for="fechaVencimiento" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha
+                    Vencimiento</label>
+                <input type="date" id="fechaVencimiento"
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <small style="color: #666; margin-top: 4px; display: block;">Opcional si el tipo de documento no
+                    requiere vencimiento</small>
             </div>
-            
+
             <!-- Archivo -->
             <div style="margin-bottom: 20px;">
-                <label for="archivoActual" style="display: block; margin-bottom: 8px; font-weight: 600;">Archivo actual</label>
-                <div id="archivoActual" style="padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 12px;">
+                <div style="display: block; margin-bottom: 8px; font-weight: 600;">
+                    Archivo actual
+                </div>
+
+                <div id="archivoActual"
+                    style="padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 12px;">
                     No hay archivo cargado
                 </div>
-                <label for="archivoNuevo" style="display: block; margin-bottom: 8px; font-weight: 600;">Cambiar archivo (PDF)</label>
+                <label for="archivoNuevo" style="display: block; margin-bottom: 8px; font-weight: 600;">Cambiar archivo
+                    (PDF)</label>
                 <input type="file" id="archivoNuevo" accept=".pdf" style="width: 100%;">
-                <small style="color: #666; margin-top: 4px; display: block;">Solo archivos PDF. Si no seleccionas nada, se mantiene el archivo actual.</small>
+                <small style="color: #666; margin-top: 4px; display: block;">Solo archivos PDF. Si no seleccionas nada,
+                    se mantiene el archivo actual.</small>
             </div>
-            
+
             <!-- Observación -->
             <div style="margin-bottom: 20px;">
-                <label for="observacion" style="display: block; margin-bottom: 8px; font-weight: 600;">Observación</label>
-                <textarea id="observacion" rows="4" placeholder="Escribe una observación..." style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif;"></textarea>
+                <label for="observacion"
+                    style="display: block; margin-bottom: 8px; font-weight: 600;">Observación</label>
+                <textarea id="observacion" rows="4" placeholder="Escribe una observación..."
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif;"></textarea>
             </div>
-            
+
             <!-- Botones -->
             <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 30px;">
-                <button type="button" id="btnCancelar" style="padding: 12px 24px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #333; font-size: 15px; font-weight: 600; cursor: pointer;">Cancelar</button>
-                <button type="submit" id="btnGuardar" style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Guardar cambios</button>
+                <button type="button" id="btnCancelar"
+                    style="padding: 12px 24px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #333; font-size: 15px; font-weight: 600; cursor: pointer;">Cancelar</button>
+                <button type="submit" id="btnGuardar"
+                    style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Guardar
+                    cambios</button>
             </div>
         </form>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/dropdown.js"></script>
     <script>
-         const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
+        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
+
         let idDocumentoEdit = null;
         let tractosData = [];
         let tiposDocumentoData = [];
         let documentoActual = null;
-        
+
         // Función inicializar async que espera todo
         async function inicializar() {
             cargarIdDocumento();
-            
+
             await Promise.all([
                 cargarTractos(),
                 cargarTiposDocumento()
             ]);
-            
+
             await cargarDocumento();
-            
+
             // Mostrar formulario DESPU�?S de cargar datos
             document.getElementById('cargando').style.display = 'none';
             document.getElementById('formularioDocumento').style.display = 'block';
         }
-        
+
         function cargarIdDocumento() {
             const urlParams = new URLSearchParams(window.location.search);
             idDocumentoEdit = urlParams.get('id');
-            
+
             if (!idDocumentoEdit) {
                 alert('Error: No se especificó el ID del documento');
                 window.location.href = 'Vista_Tracto_Doc.html';
                 return;
             }
-            
+
             document.getElementById('idDocumento').value = idDocumentoEdit;
         }
-        
+
         async function cargarTractos() {
             const { data, error } = await supabaseClient
                 .from('tracto')
                 .select('*')
                 .eq('estado', true)
                 .order('placa');
-            
+
             if (error) {
                 console.error('Error al cargar tractos:', error);
                 return;
             }
-            
+
             tractosData = data;
-            
+
             const select = document.getElementById('idTracto');
-            
+
             data.forEach(tracto => {
                 const option = document.createElement('option');
                 option.value = tracto.id_tracto;
@@ -176,7 +199,7 @@
                 select.appendChild(option);
             });
         }
-        
+
         async function cargarTiposDocumento() {
             const { data, error } = await supabaseClient
                 .from('tipo_documento')
@@ -184,16 +207,16 @@
                 .eq('estado', true)
                 .eq('categoria', 'tracto')
                 .order('nombre');
-            
+
             if (error) {
                 console.error('Error al cargar tipos de documento:', error);
                 return;
             }
-            
+
             tiposDocumentoData = data;
-            
+
             const select = document.getElementById('idTipoDocumento');
-            
+
             data.forEach(tipo => {
                 const option = document.createElement('option');
                 option.value = tipo.id_tipo_documento;
@@ -201,182 +224,183 @@
                 select.appendChild(option);
             });
         }
-        
+
         async function cargarDocumento() {
 
-    const response =
-        await fetch(
-            `/api/documentos-tracto/${idDocumentoEdit}`
-        );
+            const response =
+                await fetch(
+                    `/api/documentos-tracto/${idDocumentoEdit}`
+                );
 
-    const data =
-        await response.json();
+            const data =
+                await response.json();
 
-    if (!response.ok) {
+            if (!response.ok) {
 
-        alert(data.message);
+                alert(data.message);
 
-        window.location.href =
-            'Vista_Tracto_Doc.html';
+                window.location.href =
+                    'Vista_Tracto_Doc.html';
 
-        return;
-    }
+                return;
+            }
 
-    documentoActual =
-        data;
+            documentoActual =
+                data;
 
-    document.getElementById(
-        'idTracto'
-    ).value =
-        data.id_tracto;
+            document.getElementById(
+                'idTracto'
+            ).value =
+                data.id_tracto;
 
-    document.getElementById(
-        'idTipoDocumento'
-    ).value =
-        data.id_tipo_documento;
+            document.getElementById(
+                'idTipoDocumento'
+            ).value =
+                data.id_tipo_documento;
 
-    document.getElementById(
-        'fechaEmision'
-    ).value =
-        data.fecha_emision
-            ? data.fecha_emision.slice(0,10)
-            : '';
+            document.getElementById(
+                'fechaEmision'
+            ).value =
+                data.fecha_emision
+                    ? data.fecha_emision.slice(0, 10)
+                    : '';
 
-    document.getElementById(
-        'fechaVencimiento'
-    ).value =
-        data.fecha_vencimiento
-            ? data.fecha_vencimiento.slice(0,10)
-            : '';
+            document.getElementById(
+                'fechaVencimiento'
+            ).value =
+                data.fecha_vencimiento
+                    ? data.fecha_vencimiento.slice(0, 10)
+                    : '';
 
-    document.getElementById(
-        'observacion'
-    ).value =
-        data.observacion || '';
+            document.getElementById(
+                'observacion'
+            ).value =
+                data.observacion || '';
 
-    const archivoActualDiv =
-        document.getElementById(
-            'archivoActual'
-        );
+            const archivoActualDiv =
+                document.getElementById(
+                    'archivoActual'
+                );
 
-    if (data.archivo_url) {
+            if (data.archivo_url) {
 
-        archivoActualDiv.innerHTML =
-            `
+                archivoActualDiv.innerHTML =
+                    `
             <a
                 href="${data.archivo_url}"
                 target="_blank">
                 Ver PDF actual
             </a>
             `;
-    }
-}
-        
-     async function guardarDocumento(e) {
-
-    e.preventDefault();
-
-    const formData =
-        new FormData();
-
-    formData.append(
-        'id_tracto',
-        document.getElementById(
-            'idTracto'
-        ).value
-    );
-
-    formData.append(
-        'id_tipo_documento',
-        document.getElementById(
-            'idTipoDocumento'
-        ).value
-    );
-
-    formData.append(
-        'fecha_emision',
-        document.getElementById(
-            'fechaEmision'
-        ).value
-    );
-
-    formData.append(
-        'fecha_vencimiento',
-        document.getElementById(
-            'fechaVencimiento'
-        ).value
-    );
-
-    formData.append(
-        'observacion',
-        document.getElementById(
-            'observacion'
-        ).value
-    );
-
-    formData.append(
-        'archivo_actual',
-        documentoActual.archivo_url || ''
-    );
-
-    const archivoNuevo =
-        document.getElementById(
-            'archivoNuevo'
-        ).files[0];
-
-    if (archivoNuevo) {
-
-        formData.append(
-            'archivo',
-            archivoNuevo
-        );
-    }
-
-    const response =
-        await fetch(
-            `/api/documentos-tracto/${idDocumentoEdit}`,
-            {
-                method: 'PUT',
-                body: formData
             }
-        );
+        }
 
-    const data =
-        await response.json();
+        async function guardarDocumento(e) {
 
-    if (!response.ok) {
+            e.preventDefault();
 
-        alert(data.message);
+            const formData =
+                new FormData();
 
-        return;
-    }
+            formData.append(
+                'id_tracto',
+                document.getElementById(
+                    'idTracto'
+                ).value
+            );
 
-    alert(
-        'Documento actualizado correctamente'
-    );
+            formData.append(
+                'id_tipo_documento',
+                document.getElementById(
+                    'idTipoDocumento'
+                ).value
+            );
 
-    window.location.href =
-        'Vista_Tracto_Doc.html';
-}
+            formData.append(
+                'fecha_emision',
+                document.getElementById(
+                    'fechaEmision'
+                ).value
+            );
+
+            formData.append(
+                'fecha_vencimiento',
+                document.getElementById(
+                    'fechaVencimiento'
+                ).value
+            );
+
+            formData.append(
+                'observacion',
+                document.getElementById(
+                    'observacion'
+                ).value
+            );
+
+            formData.append(
+                'archivo_actual',
+                documentoActual.archivo_url || ''
+            );
+
+            const archivoNuevo =
+                document.getElementById(
+                    'archivoNuevo'
+                ).files[0];
+
+            if (archivoNuevo) {
+
+                formData.append(
+                    'archivo',
+                    archivoNuevo
+                );
+            }
+
+            const response =
+                await fetch(
+                    `/api/documentos-tracto/${idDocumentoEdit}`,
+                    {
+                        method: 'PUT',
+                        body: formData
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                alert(data.message);
+
+                return;
+            }
+
+            alert(
+                'Documento actualizado correctamente'
+            );
+
+            window.location.href =
+                'Vista_Tracto_Doc.html';
+        }
         document.getElementById('formularioDocumento').addEventListener('submit', guardarDocumento);
-        
+
         document.getElementById('btnCancelar').addEventListener('click', () => {
             window.location.href = 'Vista_Tracto_Doc.html';
         });
-        
+
         document.getElementById('logoutBtn').addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.clear();
             window.location.href = '../index.html';
         });
-        
+
         document.getElementById('perfilBtn').addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = 'Vista_Perfil.html';
         });
-        
+
         // Inicializar
         inicializar();
     </script>
 </body>
+
 </html>
