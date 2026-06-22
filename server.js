@@ -1877,6 +1877,110 @@ app.post(
         }
     }
 );
+// ==========================
+// OBTENER CARRETA POR ID
+// ==========================
+app.get(
+    '/api/carretas/:id',
+    async (req, res) => {
+
+        try {
+
+            const { id } =
+                req.params;
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT *
+                    FROM carreta
+                    WHERE id_carreta = $1
+                    `,
+                    [id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+                        message:
+                            'Carreta no encontrada'
+                    });
+            }
+
+            res.json(
+                result.rows[0]
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                message:
+                    error.message
+            });
+        }
+    }
+);
+// ==========================
+// ACTUALIZAR CARRETA
+// ==========================
+app.put(
+    '/api/carretas/:id',
+    async (req, res) => {
+
+        try {
+
+            const { id } =
+                req.params;
+
+            const {
+                placa,
+                tipo,
+                id_tracto
+            } = req.body;
+
+            const result =
+                await pool.query(
+                    `
+                    UPDATE carreta
+                    SET
+                        placa = $1,
+                        tipo = $2,
+                        id_tracto = $3
+                    WHERE id_carreta = $4
+                    RETURNING *
+                    `,
+                    [
+                        placa,
+                        tipo || null,
+                        id_tracto || null,
+                        id
+                    ]
+                );
+
+            res.json({
+                success: true,
+                carreta:
+                    result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================

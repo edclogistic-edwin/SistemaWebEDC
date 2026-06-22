@@ -74,12 +74,8 @@
         <a href="Vista_Carreta.html" style="display: inline-block; margin-top: 24px; color: var(--primary-red); text-decoration: none; font-weight: 600;"> Volver a la lista de carretas</a>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-         const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
+     <script>
+              
         // Obtener ID de la carreta desde la URL
         const urlParams = new URLSearchParams(window.location.search);
         const idCarreta = urlParams.get('id');
@@ -95,100 +91,210 @@
         const tractoLoading = document.getElementById('tractoLoading');
         
         // Cargar carreta por ID
-        async function cargarCarreta() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('carreta')
-                    .select('*')
-                    .eq('id_carreta', idCarreta)
-                    .single();
-                
-                if (error) {
-                    throw new Error('Error al cargar carreta: ' + error.message);
-                }
-                
-                // Rellenar formulario
-                document.getElementById('placa').value = data.placa || '';
-                document.getElementById('tipo').value = data.tipo || '';
-                document.getElementById('id_tracto').value = data.id_tracto || '';
-                
-            } catch (err) {
-                mostrarMensaje('Error: ' + err.message, 'error');
-            }
+       async function cargarCarreta() {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/carretas/${idCarreta}`
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
+
+        document.getElementById(
+            'placa'
+        ).value =
+            data.placa || '';
+
+        document.getElementById(
+            'tipo'
+        ).value =
+            data.tipo || '';
+
+        document.getElementById(
+            'id_tracto'
+        ).value =
+            data.id_tracto || '';
+
+    } catch (err) {
+
+        mostrarMensaje(
+            'Error: ' + err.message,
+            'error'
+        );
+    }
+}
         
         // Cargar tractos desde la BD (AUTOMÁTICO)
         async function cargarTractos() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('tracto')
-                    .select('*')
-                    .eq('estado', true);
-                
-                if (error) {
-                    throw new Error('Error al cargar tractos: ' + error.message);
-                }
-                
-                tractoLoading.style.display = 'none';
-                
-                if (data.length === 0) {
-                    idTractoSelect.innerHTML = '<option value="">No hay tractos disponibles</option>';
-                    return;
-                }
-                
-                // Rellenar dropdown con todos los tractos
-                data.forEach(tracto => {
-                    const option = document.createElement('option');
-                    option.value = tracto.id_tracto;
-                    option.textContent = `${tracto.placa} - ${tracto.marca || 'Sin marca'} (Año: ${tracto.anio || 'Sin año'})`;
-                    idTractoSelect.appendChild(option);
-                });
-                
-            } catch (err) {
-                mostrarMensaje('Error: ' + err.message, 'error');
-                tractoLoading.style.display = 'none';
-            }
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/tractos-activos'
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
+
+        tractoLoading.style.display =
+            'none';
+
+        if (data.length === 0) {
+
+            idTractoSelect.innerHTML =
+                '<option value="">No hay tractos disponibles</option>';
+
+            return;
+        }
+
+        data.forEach(
+            tracto => {
+
+                const option =
+                    document.createElement(
+                        'option'
+                    );
+
+                option.value =
+                    tracto.id_tracto;
+
+                option.textContent =
+                    `${tracto.placa} - ${tracto.marca || 'Sin marca'} (Año: ${tracto.anio || 'Sin año'})`;
+
+                idTractoSelect.appendChild(
+                    option
+                );
+            }
+        );
+
+    } catch (err) {
+
+        mostrarMensaje(
+            'Error: ' + err.message,
+            'error'
+        );
+
+        tractoLoading.style.display =
+            'none';
+    }
+}
         
         // Guardar cambios
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            mensaje.style.display = 'none';
-            mensaje.className = 'error';
-            
-            const submitBtn = form.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Guardando...';
-            
-            try {
-                const carreta = {
-                    placa: document.getElementById('placa').value,
-                    tipo: document.getElementById('tipo').value || null,
-                    id_tracto: parseInt(document.getElementById('id_tracto').value),
-                    estado: true
-                };
-                
-                const { error: updateError } = await supabaseClient
-                    .from('carreta')
-                    .update(carreta)
-                    .eq('id_carreta', idCarreta);
-                
-                if (updateError) {
-                    throw new Error('Error al actualizar carreta: ' + updateError.message);
-                }
-                
-                mostrarMensaje('Carreta actualizada con éxito! Redirigiendo...', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'Vista_Carreta.html';
-                }, 1500);
-                
-            } catch (err) {
-                mostrarMensaje('Error: ' + err.message, 'error');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Guardar Cambios';
+      form.addEventListener(
+    'submit',
+    async (e) => {
+
+        e.preventDefault();
+
+        mensaje.style.display =
+            'none';
+
+        const submitBtn =
+            form.querySelector(
+                'button[type="submit"]'
+            );
+
+        submitBtn.disabled =
+            true;
+
+        submitBtn.textContent =
+            'Guardando...';
+
+        try {
+
+            const carreta = {
+
+                placa:
+                    document.getElementById(
+                        'placa'
+                    ).value,
+
+                tipo:
+                    document.getElementById(
+                        'tipo'
+                    ).value || null,
+
+                id_tracto:
+                    document.getElementById(
+                        'id_tracto'
+                    ).value || null
+            };
+
+            const response =
+                await fetch(
+                    `/api/carretas/${idCarreta}`,
+                    {
+                        method: 'PUT',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json'
+                        },
+
+                        body: JSON.stringify(
+                            carreta
+                        )
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message
+                );
             }
-        });
+
+            mostrarMensaje(
+                'Carreta actualizada con éxito!',
+                'success'
+            );
+
+            setTimeout(
+                () => {
+
+                    window.location.href =
+                        'Vista_Carreta.html';
+
+                },
+                1500
+            );
+
+        } catch (err) {
+
+            mostrarMensaje(
+                'Error: ' + err.message,
+                'error'
+            );
+
+            submitBtn.disabled =
+                false;
+
+            submitBtn.textContent =
+                'Guardar Cambios';
+        }
+    }
+);
         
         function mostrarMensaje(texto, tipo) {
             mensaje.textContent = texto;
