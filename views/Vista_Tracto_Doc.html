@@ -87,28 +87,17 @@
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/dropdown.js"></script>
+     <script src="../js/dropdown.js"></script>
     <script>
-        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+       
         
         let todosLosDocumentos = [];
         let tractosData = [];
         
         // Cargar tractos para el filtro (usando placa)
         async function cargarTractos() {
-            const { data, error } = await supabaseClient
-                .from('tracto')
-                .select('*')
-                .eq('estado', true)
-                .order('placa');
-            
-            if (error) {
-                console.error('Error al cargar tractos:', error);
-                return;
-            }
+            const res = await fetch('/api/tractos-activos');
+const data = await res.json();
             
             tractosData = data;
             
@@ -122,40 +111,53 @@
             });
         }
         
-        async function cargarDocumentos() {
-            const tbody = document.getElementById('tablaTractoDoc');
-            
-            // JOIN con tracto y tipo_documento (usando placa)
-            const { data, error } = await supabaseClient
-                .from('documento_tracto')
-                .select(`
-                    id_documento,
-                    id_tracto,
-                    id_tipo_documento,
-                    archivo_url,
-                    fecha_emision,
-                    fecha_vencimiento,
-                    estado,
-                    observacion,
-                    tracto: id_tracto (placa, marca, modelo),
-                    tipo_documento: id_tipo_documento (nombre)
-                `)
-                .order('id_documento', { ascending: false });
-            
-            if (error) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: red;">Error: ' + error.message + '</td></tr>';
-                return;
-            }
-            
-            todosLosDocumentos = data;
-            
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9">No hay documentos registrados</td></tr>';
-                return;
-            }
-            
-            mostrarDocumentos(data);
+       async function cargarDocumentos() {
+
+    const tbody =
+        document.getElementById(
+            'tablaTractoDoc'
+        );
+
+    try {
+
+        const res =
+            await fetch(
+                '/api/documentos-tracto'
+            );
+
+        const data =
+            await res.json();
+
+        todosLosDocumentos =
+            data;
+
+        if (data.length === 0) {
+
+            tbody.innerHTML =
+                '<tr><td colspan="9">No hay documentos registrados</td></tr>';
+
+            return;
         }
+
+        mostrarDocumentos(data);
+
+    } catch (error) {
+
+        console.error(error);
+
+        tbody.innerHTML =
+            `<tr>
+                <td colspan="9"
+                    style="
+                        text-align:center;
+                        padding:40px;
+                        color:red;
+                    ">
+                    Error: ${error.message}
+                </td>
+            </tr>`;
+    }
+}
         
         // FUNCI�"N para calcular estado de vencimiento (Activo/Vence pronto/Vencido)
         function obtenerEstadoVencimiento(fechaVencimientoStr) {
@@ -202,70 +204,138 @@
         }
         
         function mostrarDocumentos(documentos) {
-            const tbody = document.getElementById('tablaTractoDoc');
-            
-            if (documentos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9">No se encontraron documentos</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = documentos.map(d => {
-                const tracto = d.tracto;
-                const tipo = d.tipo_documento;
-                const tractoNombre = tracto ? `${tracto.placa} ${tracto.marca || ''} ${tracto.modelo || ''}`.trim() : 'Desconocido';
-                const tipoNombre = tipo ? tipo.nombre : 'Desconocido';
-                const fechaEmision = d.fecha_emision ? d.fecha_emision.slice(0,10) : '-';
-                
-                // Obtener estado de vencimiento
-                const estadoVencimiento = obtenerEstadoVencimiento(d.fecha_vencimiento);
-                
-                return `
-                    <tr style="${!d.estado ? 'background: #f5f5f5; color: #666;' : ''}">
-                        <td>${d.id_documento}</td>
-                        <td>${tractoNombre}</td>
-                        <td>${tipoNombre}</td>
-                        <td>${fechaEmision}</td>
-                        <td style="font-weight: 600; color: ${estadoVencimiento.color};">
-                            ${estadoVencimiento.texto}
-                        </td>
-                        <td>
-                            <a href="${d.archivo_url || ''}" target="_blank" style="color: #0ea5e9; text-decoration: none; font-weight: 600;">
-                                 Ver PDF
-                            </a>
-                        </td>
-                        <td>${d.observacion || '-'}</td>
-                        <td>
-                            <button onclick="toggleEstadoDocumento(${d.id_documento}, ${d.estado})" 
-                                style="padding: 6px 12px; border: none; border-radius: 6px; background: ${d.estado ? '#059669' : '#dc2626'}; color: white; font-size: 13px; font-weight: 600; cursor: pointer;">
-                                ${d.estado ? 'Activo' : 'Inactivo'}
-                            </button>
-                        </td>
-                        <td style="text-align: center;">
-                            <a href="editar_documento_tracto.html?id=${d.id_documento}" style="color: #0ea5e9; text-decoration: none; font-weight: 600; margin-right: 8px;">Editar</a>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
+
+    const tbody =
+        document.getElementById(
+            'tablaTractoDoc'
+        );
+
+    if (documentos.length === 0) {
+
+        tbody.innerHTML =
+            '<tr><td colspan="9">No se encontraron documentos</td></tr>';
+
+        return;
+    }
+
+    tbody.innerHTML =
+        documentos.map(d => {
+
+            const tractoNombre =
+                `${d.placa || ''} ${d.marca || ''} ${d.modelo || ''}`.trim();
+
+            const tipoNombre =
+                d.tipo_nombre || 'Desconocido';
+
+            const fechaEmision =
+                d.fecha_emision
+                    ? d.fecha_emision.slice(0, 10)
+                    : '-';
+
+            const estadoVencimiento =
+                obtenerEstadoVencimiento(
+                    d.fecha_vencimiento
+                );
+
+            return `
+                <tr style="${!d.estado ? 'background:#f5f5f5;color:#666;' : ''}">
+                    <td>${d.id_documento}</td>
+
+                    <td>${tractoNombre}</td>
+
+                    <td>${tipoNombre}</td>
+
+                    <td>${fechaEmision}</td>
+
+                    <td style="
+                        font-weight:600;
+                        color:${estadoVencimiento.color};
+                    ">
+                        ${estadoVencimiento.texto}
+                    </td>
+
+                    <td>
+                        <a
+                            href="${d.archivo_url || ''}"
+                            target="_blank"
+                            style="
+                                color:#0ea5e9;
+                                text-decoration:none;
+                                font-weight:600;
+                            ">
+                            Ver PDF
+                        </a>
+                    </td>
+
+                    <td>${d.observacion || '-'}</td>
+
+                    <td>
+                        <button
+                            onclick="toggleEstadoDocumento(${d.id_documento}, ${d.estado})"
+                            style="
+                                padding:6px 12px;
+                                border:none;
+                                border-radius:6px;
+                                background:${d.estado ? '#059669' : '#dc2626'};
+                                color:white;
+                                font-size:13px;
+                                font-weight:600;
+                                cursor:pointer;
+                            ">
+                            ${d.estado ? 'Activo' : 'Inactivo'}
+                        </button>
+                    </td>
+
+                    <td>
+                        <a
+                            href="editar_documento_tracto.html?id=${d.id_documento}"
+                            style="
+                                color:#0ea5e9;
+                                text-decoration:none;
+                                font-weight:600;
+                            ">
+                            Editar
+                        </a>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+}
         
         // Toggle estado (Activo/Inactivo)
-        async function toggleEstadoDocumento(idDocumento, estadoActual) {
-            const nuevoEstado = !estadoActual;
-            
-            const { error } = await supabaseClient
-                .from('documento_tracto')
-                .update({ estado: nuevoEstado })
-                .eq('id_documento', idDocumento);
-            
-            if (error) {
-                alert('Error: ' + error.message);
-                return;
+      async function toggleEstadoDocumento(
+    idDocumento,
+    estadoActual
+) {
+
+    try {
+
+        await fetch(
+            `/api/documentos-tracto/${idDocumento}/estado`,
+            {
+                method: 'PUT',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    estado: !estadoActual
+                })
             }
-            
-            // Actualizar tabla
-            cargarDocumentos();
-        }
-        
+        );
+
+        cargarDocumentos();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            'Error al cambiar estado'
+        );
+    }
+}
         // FUNCI�"N DE FILTRO + B�sSQUEDA
         function filtrarDocumentos() {
             const idTracto = document.getElementById('filtroTracto').value;
@@ -280,15 +350,25 @@
             
             // Búsqueda por tracto (placa) o tipo
             if (termino !== '') {
-                filtrados = filtrados.filter(d => {
-                    const tracto = d.tracto;
-                    const tipo = d.tipo_documento;
-                    const tractoNombre = tracto ? `${tracto.placa} ${tracto.marca || ''} ${tracto.modelo || ''}`.toLowerCase() : '';
-                    const tipoNombre = tipo ? tipo.nombre.toLowerCase() : '';
-                    
-                    return tractoNombre.includes(termino) || tipoNombre.includes(termino);
-                });
-            }
+
+    filtrados =
+        filtrados.filter(d => {
+
+            const tractoNombre =
+                `${d.placa || ''} ${d.marca || ''} ${d.modelo || ''}`
+                    .toLowerCase();
+
+            const tipoNombre =
+                (d.tipo_nombre || '')
+                    .toLowerCase();
+
+            return (
+                tractoNombre.includes(termino)
+                ||
+                tipoNombre.includes(termino)
+            );
+        });
+}
             
             mostrarDocumentos(filtrados);
         }

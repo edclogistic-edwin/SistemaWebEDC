@@ -1178,39 +1178,108 @@ app.put('/api/documentos/:id/estado', async (req, res) => {
 // ==========================
 // LISTAR TODOS LOS TRACTOS
 // ==========================
-app.get('/api/tractos', async (req, res) => {
+app.get('/api/documentos-tracto', async (req, res) => {
+
     try {
+
         const result = await pool.query(`
-            SELECT * FROM tracto
-            ORDER BY id_tracto DESC
+            SELECT
+                dt.id_documento,
+                dt.id_tracto,
+                dt.id_tipo_documento,
+                dt.archivo_url,
+                dt.fecha_emision,
+                dt.fecha_vencimiento,
+                dt.estado,
+                dt.observacion,
+
+                t.placa,
+                t.marca,
+                t.modelo,
+
+                td.nombre AS tipo_nombre
+
+            FROM documento_tracto dt
+
+            LEFT JOIN tracto t
+                ON t.id_tracto = dt.id_tracto
+
+            LEFT JOIN tipo_documento td
+                ON td.id_tipo_documento = dt.id_tipo_documento
+
+            ORDER BY dt.id_documento DESC
         `);
 
         res.json(result.rows);
+
     } catch (error) {
+
         console.error(error);
-        res.status(500).json({ success: false, message: error.message });
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 });
 
 // ==========================
-// GET TRACTO POR ID
+// cambiar estadp
 // ==========================
-app.get('/api/tractos/:id', async (req, res) => {
+app.put('/api/documentos-tracto/:id/estado', async (req, res) => {
+
     try {
+
         const { id } = req.params;
-        const result = await pool.query(`SELECT * FROM tracto WHERE id_tracto = $1`, [id]);
+        const { estado } = req.body;
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, message: "No encontrado" });
-        }
+        await pool.query(`
+            UPDATE documento_tracto
+            SET estado = $1
+            WHERE id_documento = $2
+        `, [estado, id]);
 
-        res.json(result.rows[0]);
+        res.json({
+            success: true
+        });
+
     } catch (error) {
+
         console.error(error);
-        res.status(500).json({ success: false, message: error.message });
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 });
+app.get('/api/tractos-activos', async (req, res) => {
 
+    try {
+
+        const result = await pool.query(`
+            SELECT
+                id_tracto,
+                placa,
+                marca,
+                modelo
+            FROM tracto
+            WHERE estado = true
+            ORDER BY placa
+        `);
+
+        res.json(result.rows);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
 // ====================================
 // INICIAR SERVIDOR
 // ====================================
