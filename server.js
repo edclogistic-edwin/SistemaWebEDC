@@ -1407,7 +1407,7 @@ app.post(
                         id_tracto,
                         id_tipo_documento,
                         archivoUrl,
-                        fecha_emision,
+                        fecha_emision || null,
                         fecha_vencimiento || null,
                         observacion || null
                     ]
