@@ -522,7 +522,7 @@ app.put(
                     );
 
                 fotoUrl =
-                    `http://localhost:3000/uploads/conductores/${fileName}`;
+    `${BASE_URL}/uploads/conductores/${fileName}`;
             }
 
             const {

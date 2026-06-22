@@ -150,7 +150,7 @@
 
             try {
 
-                const res = await fetch('http://localhost:3000/api/conductores');
+                const res = await fetch('/api/conductores');
                 const data = await res.json();
 
                 idConductorSelect.innerHTML =
@@ -178,7 +178,7 @@
 
             try {
 
-                const res = await fetch('http://localhost:3000/api/tipos-documento-activos');
+                const res = await fetch('/api/tipos-documento-activos');
                 const data = await res.json();
 
                 tiposDocData = data;
@@ -268,9 +268,7 @@
                 // ==========================
                 // ENVIAR AL BACKEND (NEON)
                 // ==========================
-                const response = await fetch(
-                    'http://localhost:3000/api/documentos',
-                    {
+                const response = await await fetch('/api/documentos', {
                         method: 'POST',
                         body: formData
                     }

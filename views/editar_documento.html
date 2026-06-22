@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ==========================
 async function cargarDocumento() {
     try {
-        const res = await fetch(`http://localhost:3000/api/documentos/${idDocumentoEdit}`);
+        const res = await fetch(`/api/documentos/${idDocumentoEdit}`);
         
         if (!res.ok) {
             const error = await res.json();
@@ -200,7 +200,9 @@ async function cargarDocumento() {
 // ==========================
 async function cargarConductores() {
     try {
-        const res = await fetch('http://localhost:3000/api/conductores');
+        const res = await fetch(
+    '/api/conductores'
+);
         const data = await res.json();
 
         const select = document.getElementById('idConductor');
@@ -222,7 +224,9 @@ async function cargarConductores() {
 // ==========================
 async function cargarTiposDocumento() {
     try {
-        const res = await fetch('http://localhost:3000/api/tipos-documento-activos');
+       const res = await fetch(
+    '/api/tipos-documento-activos'
+);
         const data = await res.json();
 
         const select = document.getElementById('idTipoDocumento');
@@ -267,14 +271,13 @@ document.getElementById('formularioDocumento').addEventListener('submit', async 
         formData.append('archivo', file);
     }
 
-    const res = await fetch(
-        `http://localhost:3000/api/documentos/${idDocumentoEdit}`,
-        {
-            method: 'PUT',
-            body: formData
-        }
-    );
-
+  const res = await fetch(
+    `/api/documentos/${idDocumentoEdit}`,
+    {
+        method: 'PUT',
+        body: formData
+    }
+);
     console.log("RESPUESTA STATUS:", res.status, res.ok);
 
     // ✅ LEER RESPUESTA SIEMPRE

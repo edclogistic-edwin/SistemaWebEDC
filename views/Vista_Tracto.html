@@ -98,7 +98,7 @@
             const tbody = document.getElementById('tablaTractos');
 
             try {
-                const res = await fetch('http://localhost:3000/api/tractos');
+                const res = await fetch('/api/tractos');
                 const data = await res.json();
 
                 todosLosTractos = data;
@@ -157,7 +157,7 @@
         // ==========================
         async function toggleEstado(id, estadoActual) {
             try {
-                await fetch(`http://localhost:3000/api/tractos/${id}/estado`, {
+               await fetch(`/api/tractos/${id}/estado`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ estado: !estadoActual })

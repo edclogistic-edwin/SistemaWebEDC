@@ -207,9 +207,9 @@
             try {
 
                 const response =
-                    await fetch(
-                        `http://localhost:3000/api/conductores/${idConductor}`
-                    );
+                   await fetch(
+    `/api/conductores/${idConductor}`
+);
 
                 const data =
                     await response.json();
@@ -405,12 +405,12 @@
 
                     const response =
                         await fetch(
-                            `http://localhost:3000/api/conductores/${idConductor}`,
-                            {
-                                method: 'PUT',
-                                body: formData
-                            }
-                        );
+    `/api/conductores/${idConductor}`,
+    {
+        method: 'PUT',
+        body: formData
+    }
+);
 
                     if (response.ok) {
 

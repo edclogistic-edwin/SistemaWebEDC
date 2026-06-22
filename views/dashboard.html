@@ -132,9 +132,7 @@
         try {
 
             const response =
-                await fetch(
-                    'http://localhost:3000/api/dashboard/contadores'
-                );
+             await fetch('/api/dashboard/contadores');
 
             const data =
                 await response.json();
@@ -280,10 +278,7 @@
         try {
 
             const response =
-                await fetch(
-                    'http://localhost:3000/api/dashboard/documentos'
-                );
-
+                await fetch('/api/dashboard/documentos');
             docsVencer =
                 await response.json();
 

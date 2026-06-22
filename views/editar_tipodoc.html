@@ -103,8 +103,8 @@ async function cargarTipoDoc() {
     try {
 
         const response = await fetch(
-            `http://localhost:3000/api/tipo-documentos/${idTipoDoc}`
-        );
+    `/api/tipo-documentos/${idTipoDoc}`
+);
 
         const data = await response.json();
 
@@ -136,7 +136,7 @@ form.addEventListener('submit', async (e) => {
         };
 
         const response = await fetch(
-            `http://localhost:3000/api/tipo-documentos/${idTipoDoc}`,
+            `/api/tipo-documentos/${idTipoDoc}`,
             {
                 method: 'PUT',
                 headers: {
