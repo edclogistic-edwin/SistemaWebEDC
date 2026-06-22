@@ -1738,6 +1738,87 @@ app.put(
         }
     }
 );
+// ==========================
+// LISTAR CARRETAS
+// ==========================
+app.get('/api/carretas', async (req, res) => {
+
+    try {
+
+        const result = await pool.query(`
+            SELECT
+                c.id_carreta,
+                c.foto_url,
+                c.placa,
+                c.tipo,
+                c.id_tracto,
+                c.estado,
+
+                t.placa AS tracto_placa,
+                t.marca AS tracto_marca
+
+            FROM carreta c
+
+            LEFT JOIN tracto t
+                ON t.id_tracto = c.id_tracto
+
+            ORDER BY c.id_carreta DESC
+        `);
+
+        res.json(result.rows);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});
+// ==========================
+// TOGGLE ESTADO CARRETA
+// ==========================
+app.put(
+    '/api/carretas/:id/estado',
+    async (req, res) => {
+
+        try {
+
+            const { id } =
+                req.params;
+
+            const { estado } =
+                req.body;
+
+            await pool.query(
+                `
+                UPDATE carreta
+                SET estado = $1
+                WHERE id_carreta = $2
+                `,
+                [
+                    estado,
+                    id
+                ]
+            );
+
+            res.json({
+                success: true
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message: error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================

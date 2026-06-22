@@ -85,73 +85,172 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+     
     <script src="../js/dropdown.js"></script>
     <script>
-        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
         let todasLasCarretas = [];
 
-        async function cargarCarretas() {
-            const tbody = document.getElementById('tablaCarretas');
+       async function cargarCarretas() {
 
-            // JOIN con tabla tracto para mostrar placa y marca del tracto
-            const { data, error } = await supabaseClient
-                .from('carreta')
-                .select(`
-                    id_carreta,
-                    placa,
-                    tipo,
-                    id_tracto,
-                    estado,
-                    tracto: id_tracto (placa, marca)
-                `)
-                .order('id_carreta', { ascending: false });
+    const tbody =
+        document.getElementById(
+            'tablaCarretas'
+        );
 
-            if (error) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: red;">Error: ' + error.message + '</td></tr>';
-                return;
-            }
+    try {
 
-            todasLasCarretas = data;
+        const res =
+            await fetch(
+                '/api/carretas'
+            );
 
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6">No hay carretas registradas</td></tr>';
-                return;
-            }
+        const data =
+            await res.json();
 
-            mostrarCarretas(data);
+        todosLasCarretas =
+            data;
+
+        if (data.length === 0) {
+
+            tbody.innerHTML =
+                '<tr><td colspan="6">No hay carretas registradas</td></tr>';
+
+            return;
         }
+
+        mostrarCarretas(
+            data
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        tbody.innerHTML =
+            `<tr>
+                <td colspan="6"
+                    style="
+                        text-align:center;
+                        color:red;
+                        padding:40px;
+                    ">
+                    Error: ${error.message}
+                </td>
+            </tr>`;
+    }
+}
 
         function mostrarCarretas(carretas) {
-            const tbody = document.getElementById('tablaCarretas');
 
-            if (carretas.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6">No se encontraron carretas</td></tr>';
-                return;
+    const tbody =
+        document.getElementById(
+            'tablaCarretas'
+        );
+
+    if (carretas.length === 0) {
+
+        tbody.innerHTML =
+            '<tr><td colspan="6">No se encontraron carretas</td></tr>';
+
+        return;
+    }
+
+    tbody.innerHTML =
+        carretas.map(c => {
+
+            const tractoTexto =
+                c.tracto_placa
+                    ? `${c.tracto_placa} - ${c.tracto_marca || ''}`
+                    : 'No asignado';
+
+            return `
+            <tr style="${!c.estado ? 'background:#f5f5f5;color:#666;' : ''}">
+                
+                <td>${c.id_carreta}</td>
+
+                <td>
+                    ${
+                        c.foto_url
+                        ? `<img
+                                src="${c.foto_url}"
+                                style="
+                                    width:60px;
+                                    height:40px;
+                                    object-fit:cover;
+                                    border-radius:4px;
+                                "
+                          >`
+                        : 'Sin foto'
+                    }
+                </td>
+
+                <td>${c.placa}</td>
+
+                <td>${c.tipo || '-'}</td>
+
+                <td>${tractoTexto}</td>
+
+                <td>
+                    <span
+                        style="
+                            color:${c.estado ? 'green' : 'red'};
+                            cursor:pointer;
+                        "
+                        onclick="
+                            toggleEstado(
+                                ${c.id_carreta},
+                                ${c.estado}
+                            )
+                        ">
+                        ${c.estado ? 'Activo' : 'Inactivo'}
+                    </span>
+                </td>
+
+                <td>
+                    <a href="editar_carreta.html?id=${c.id_carreta}">
+                        Editar
+                    </a>
+                </td>
+
+            </tr>
+            `;
+
+        }).join('');
+}
+async function toggleEstado(
+    id,
+    estadoActual
+) {
+
+    try {
+
+        await fetch(
+            `/api/carretas/${id}/estado`,
+            {
+                method: 'PUT',
+
+                headers: {
+                    'Content-Type':
+                        'application/json'
+                },
+
+                body: JSON.stringify({
+                    estado: !estadoActual
+                })
             }
+        );
 
-            tbody.innerHTML = carretas.map(c => {
-                const tracto = c.tracto;
-                const tractoTexto = tracto ? `${tracto.placa} - ${tracto.marca || 'Sin marca'}` : 'No asignado';
+        cargarCarretas();
 
-                return `
-                    <tr style="${!c.estado ? 'background: #f5f5f5; color: #666;' : ''}">
-                        <td>${c.id_carreta}</td>
-                        <td>${c.placa}</td>
-                        <td>${c.tipo || '-'}</td>
-                        <td>${tractoTexto}</td>
-                        <td>${c.estado ? 'Activo' : 'Inactivo'}</td>
-                        <td style="text-align: center;">
-                            <a href="editar_carreta.html?id=${c.id_carreta}" style="color: #0ea5e9; text-decoration: none; font-weight: 600; margin-right: 8px;">Editar</a>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
+    } catch (err) {
 
+        console.error(err);
+
+        alert(
+            'Error al cambiar estado'
+        );
+    }
+}
         // FUNCI�"N DE B�sSQUEDA
         function buscarCarretas() {
             const termino = document.getElementById('buscador').value.toLowerCase().trim();
