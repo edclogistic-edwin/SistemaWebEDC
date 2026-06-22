@@ -2098,6 +2098,41 @@ app.put(
         }
     }
 );
+// ==========================
+// LISTAR TRACTOS ACTIVOS
+// ==========================
+app.get('/api/tractos-activos', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT * FROM tracto
+            WHERE estado = true
+            ORDER BY placa
+        `);
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// ==========================
+// LISTAR TIPOS DE DOCUMENTO DE CATEGORÍA 'TRACTO' ACTIVOS
+// ==========================
+app.get('/api/tipos-documento-tracto', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT * FROM tipo_documento
+            WHERE categoria = 'tracto' AND estado = true
+            ORDER BY nombre
+        `);
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
 // ====================================
 // INICIAR SERVIDOR
 // ====================================

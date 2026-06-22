@@ -135,12 +135,9 @@
         </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/dropdown.js"></script>
+     <script src="../js/dropdown.js"></script>
     <script>
-        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+         
 
         let idDocumentoEdit = null;
         let tractosData = [];
@@ -176,55 +173,41 @@
             document.getElementById('idDocumento').value = idDocumentoEdit;
         }
 
-        async function cargarTractos() {
-            const { data, error } = await supabaseClient
-                .from('tracto')
-                .select('*')
-                .eq('estado', true)
-                .order('placa');
+      async function cargarTractos() {
+    try {
+        const response = await fetch('http://localhost:3000/api/tractos-activos');
+        const tractosData = await response.json();
 
-            if (error) {
-                console.error('Error al cargar tractos:', error);
-                return;
-            }
+        const select = document.getElementById('idTracto');
 
-            tractosData = data;
+        tractosData.forEach(tracto => {
+            const option = document.createElement('option');
+            option.value = tracto.id_tracto;
+            option.textContent = `${tracto.placa} - ${tracto.marca || ''} ${tracto.modelo || ''}`.trim();
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error al cargar tractos:', error);
+    }
+}
 
-            const select = document.getElementById('idTracto');
+async function cargarTiposDocumento() {
+    try {
+        const response = await fetch('http://localhost:3000/api/tipos-documento-tracto');
+        const tiposData = await response.json();
 
-            data.forEach(tracto => {
-                const option = document.createElement('option');
-                option.value = tracto.id_tracto;
-                option.textContent = `${tracto.placa} - ${tracto.marca || ''} ${tracto.modelo || ''}`.trim();
-                select.appendChild(option);
-            });
-        }
+        const select = document.getElementById('idTipoDocumento');
 
-        async function cargarTiposDocumento() {
-            const { data, error } = await supabaseClient
-                .from('tipo_documento')
-                .select('*')
-                .eq('estado', true)
-                .eq('categoria', 'tracto')
-                .order('nombre');
-
-            if (error) {
-                console.error('Error al cargar tipos de documento:', error);
-                return;
-            }
-
-            tiposDocumentoData = data;
-
-            const select = document.getElementById('idTipoDocumento');
-
-            data.forEach(tipo => {
-                const option = document.createElement('option');
-                option.value = tipo.id_tipo_documento;
-                option.textContent = tipo.nombre;
-                select.appendChild(option);
-            });
-        }
-
+        tiposData.forEach(tipo => {
+            const option = document.createElement('option');
+            option.value = tipo.id_tipo_documento;
+            option.textContent = tipo.nombre;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error al cargar tipos de documento:', error);
+    }
+}
         async function cargarDocumento() {
 
             const response =
