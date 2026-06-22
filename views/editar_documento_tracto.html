@@ -203,127 +203,161 @@
         }
         
         async function cargarDocumento() {
-            const { data, error } = await supabaseClient
-                .from('documento_tracto')
-                .select(`
-                    id_documento,
-                    id_tracto,
-                    id_tipo_documento,
-                    archivo_url,
-                    fecha_emision,
-                    fecha_vencimiento,
-                    observacion
-                `)
-                .eq('id_documento', idDocumentoEdit)
-                .single();
-            
-            if (error) {
-                console.error('Error al cargar documento:', error);
-                alert('Error: ' + error.message);
-                window.location.href = 'Vista_Tracto_Doc.html';
-                return;
-            }
-            
-            documentoActual = data;
-            
-            console.log('Datos cargados:', data);
-            
-            document.getElementById('idTracto').value = data.id_tracto;
-            document.getElementById('idTipoDocumento').value = data.id_tipo_documento;
-            document.getElementById('fechaEmision').value = data.fecha_emision ? data.fecha_emision.slice(0, 10) : '';
-            document.getElementById('fechaVencimiento').value = data.fecha_vencimiento ? data.fecha_vencimiento.slice(0, 10) : '';
-            document.getElementById('observacion').value = data.observacion || '';
-            
-            const archivoActualDiv = document.getElementById('archivoActual');
-            if (data.archivo_url) {
-                archivoActualDiv.innerHTML = `
-                    <a href="${data.archivo_url}" target="_blank" style="color: #0ea5e9; font-weight: 600;">
-                         Ver PDF actual
-                    </a>
-                `;
-            } else {
-                archivoActualDiv.textContent = 'No hay archivo cargado';
-            }
-        }
+
+    const response =
+        await fetch(
+            `/api/documentos-tracto/${idDocumentoEdit}`
+        );
+
+    const data =
+        await response.json();
+
+    if (!response.ok) {
+
+        alert(data.message);
+
+        window.location.href =
+            'Vista_Tracto_Doc.html';
+
+        return;
+    }
+
+    documentoActual =
+        data;
+
+    document.getElementById(
+        'idTracto'
+    ).value =
+        data.id_tracto;
+
+    document.getElementById(
+        'idTipoDocumento'
+    ).value =
+        data.id_tipo_documento;
+
+    document.getElementById(
+        'fechaEmision'
+    ).value =
+        data.fecha_emision
+            ? data.fecha_emision.slice(0,10)
+            : '';
+
+    document.getElementById(
+        'fechaVencimiento'
+    ).value =
+        data.fecha_vencimiento
+            ? data.fecha_vencimiento.slice(0,10)
+            : '';
+
+    document.getElementById(
+        'observacion'
+    ).value =
+        data.observacion || '';
+
+    const archivoActualDiv =
+        document.getElementById(
+            'archivoActual'
+        );
+
+    if (data.archivo_url) {
+
+        archivoActualDiv.innerHTML =
+            `
+            <a
+                href="${data.archivo_url}"
+                target="_blank">
+                Ver PDF actual
+            </a>
+            `;
+    }
+}
         
-        async function guardarDocumento(e) {
-            e.preventDefault();
-            
-            const idTracto = document.getElementById('idTracto').value;
-            const idTipoDocumento = document.getElementById('idTipoDocumento').value;
-            const fechaEmision = document.getElementById('fechaEmision').value;
-            const fechaVencimiento = document.getElementById('fechaVencimiento').value;
-            const observacion = document.getElementById('observacion').value;
-            const archivoNuevo = document.getElementById('archivoNuevo').files[0];
-            
-            if (!idTracto) {
-                alert('Selecciona un tracto');
-                return;
+     async function guardarDocumento(e) {
+
+    e.preventDefault();
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        'id_tracto',
+        document.getElementById(
+            'idTracto'
+        ).value
+    );
+
+    formData.append(
+        'id_tipo_documento',
+        document.getElementById(
+            'idTipoDocumento'
+        ).value
+    );
+
+    formData.append(
+        'fecha_emision',
+        document.getElementById(
+            'fechaEmision'
+        ).value
+    );
+
+    formData.append(
+        'fecha_vencimiento',
+        document.getElementById(
+            'fechaVencimiento'
+        ).value
+    );
+
+    formData.append(
+        'observacion',
+        document.getElementById(
+            'observacion'
+        ).value
+    );
+
+    formData.append(
+        'archivo_actual',
+        documentoActual.archivo_url || ''
+    );
+
+    const archivoNuevo =
+        document.getElementById(
+            'archivoNuevo'
+        ).files[0];
+
+    if (archivoNuevo) {
+
+        formData.append(
+            'archivo',
+            archivoNuevo
+        );
+    }
+
+    const response =
+        await fetch(
+            `/api/documentos-tracto/${idDocumentoEdit}`,
+            {
+                method: 'PUT',
+                body: formData
             }
-            
-            if (!idTipoDocumento) {
-                alert('Selecciona un tipo de documento');
-                return;
-            }
-            
-            if (!fechaEmision) {
-                alert('Ingresa la fecha de emisión');
-                return;
-            }
-            
-            const datos = {
-                id_tracto: parseInt(idTracto),
-                id_tipo_documento: parseInt(idTipoDocumento),
-                fecha_emision: fechaEmision,
-                fecha_vencimiento: fechaVencimiento || null,
-                observacion: observacion
-            };
-            
-            if (archivoNuevo) {
-                if (archivoNuevo.type !== 'application/pdf') {
-                    alert('Solo se permiten archivos PDF');
-                    return;
-                }
-                
-                const nombreLimpio = archivoNuevo.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-                const archivoNombre = `documento_tracto_${idDocumentoEdit}_${nombreLimpio}`;
-                
-                console.log('Subiendo archivo:', archivoNombre);
-                
-                const { error: uploadError } = await supabaseClient.storage
-                    .from('archivos')
-                    .upload(archivoNombre, archivoNuevo);
-                
-                if (uploadError) {
-                    console.error('Error al subir:', uploadError);
-                    alert('Error al subir archivo: ' + uploadError.message);
-                    return;
-                }
-                
-                console.log('Archivo subido correctamente');
-                
-                const { data: publicUrlData } = supabaseClient.storage
-                    .from('archivos')
-                    .getPublicUrl(archivoNombre);
-                
-                datos.archivo_url = publicUrlData.publicUrl;
-                console.log('URL pública:', datos.archivo_url);
-            }
-            
-            const { error } = await supabaseClient
-                .from('documento_tracto')
-                .update(datos)
-                .eq('id_documento', idDocumentoEdit);
-            
-            if (error) {
-                alert('Error: ' + error.message);
-                return;
-            }
-            
-            alert('Documento actualizado correctamente!');
-            window.location.href = 'Vista_Tracto_Doc.html';
-        }
-        
+        );
+
+    const data =
+        await response.json();
+
+    if (!response.ok) {
+
+        alert(data.message);
+
+        return;
+    }
+
+    alert(
+        'Documento actualizado correctamente'
+    );
+
+    window.location.href =
+        'Vista_Tracto_Doc.html';
+}
         document.getElementById('formularioDocumento').addEventListener('submit', guardarDocumento);
         
         document.getElementById('btnCancelar').addEventListener('click', () => {

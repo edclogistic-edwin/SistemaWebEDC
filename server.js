@@ -1981,6 +1981,123 @@ app.put(
         }
     }
 );
+
+// ==========================
+// OBTENER DOCUMENTO TRACTO
+// ==========================
+app.get(
+    '/api/documentos-tracto/:id',
+    async (req, res) => {
+
+        try {
+
+            const { id } =
+                req.params;
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT *
+                    FROM documento_tracto
+                    WHERE id_documento = $1
+                    `,
+                    [id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+                        message:
+                            'Documento no encontrado'
+                    });
+            }
+
+            res.json(
+                result.rows[0]
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                message:
+                    error.message
+            });
+        }
+    }
+);
+// ==========================
+// ACTUALIZAR DOCUMENTO TRACTO
+// ==========================
+app.put(
+    '/api/documentos-tracto/:id',
+    uploadDocumentosTracto.single(
+        'archivo'
+    ),
+    async (req, res) => {
+
+        try {
+
+            const { id } =
+                req.params;
+
+            let archivoUrl =
+                req.body.archivo_actual;
+
+            if (req.file) {
+
+                archivoUrl =
+                    `${BASE_URL}/uploads/documentos_tracto/${req.file.filename}`;
+            }
+
+            const result =
+                await pool.query(
+                    `
+                    UPDATE documento_tracto
+                    SET
+                        id_tracto = $1,
+                        id_tipo_documento = $2,
+                        archivo_url = $3,
+                        fecha_emision = $4,
+                        fecha_vencimiento = $5,
+                        observacion = $6
+                    WHERE id_documento = $7
+                    RETURNING *
+                    `,
+                    [
+                        req.body.id_tracto,
+                        req.body.id_tipo_documento,
+                        archivoUrl,
+                        req.body.fecha_emision,
+                        req.body.fecha_vencimiento || null,
+                        req.body.observacion || null,
+                        id
+                    ]
+                );
+
+            res.json({
+                success: true,
+                documento:
+                    result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================
