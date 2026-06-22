@@ -1420,6 +1420,78 @@ app.post(
         }
     }
 );
+// ==========================
+// LISTAR TRACTOS
+// ==========================
+app.get(
+    '/api/tractos',
+    async (req, res) => {
+
+        try {
+
+            const result =
+                await pool.query(`
+                    SELECT *
+                    FROM tracto
+                    ORDER BY id_tracto DESC
+                `);
+
+            res.json(
+                result.rows
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
+// ==========================
+// CAMBIAR ESTADO TRACTO
+// ==========================
+app.put(
+    '/api/tractos/:id/estado',
+    async (req, res) => {
+
+        try {
+
+            const { id } =
+                req.params;
+
+            const { estado } =
+                req.body;
+
+            await pool.query(
+                `
+                UPDATE tracto
+                SET estado = $1
+                WHERE id_tracto = $2
+                `,
+                [estado, id]
+            );
+
+            res.json({
+                success: true
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================
