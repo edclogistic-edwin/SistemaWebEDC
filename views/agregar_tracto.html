@@ -82,12 +82,7 @@
         <a href="Vista_Tracto.html" style="display: inline-block; margin-top: 24px; color: var(--primary-red); text-decoration: none; font-weight: 600;"> Volver a la lista de tractos</a>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-         const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
+     <script>
         const form = document.getElementById('formAgregarTracto');
         const mensaje = document.getElementById('mensaje');
         const fotoInput = document.getElementById('fotoInput');
@@ -105,67 +100,115 @@
             }
         });
         
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            mensaje.style.display = 'none';
-            mensaje.className = 'error';
-            
-            const file = fotoInput.files[0];
-            if (!file) {
-                mostrarMensaje('Selecciona una foto', 'error');
-                return;
+        form.addEventListener(
+    'submit',
+    async (e) => {
+
+        e.preventDefault();
+
+        mensaje.style.display =
+            'none';
+
+        const submitBtn =
+            form.querySelector(
+                'button[type="submit"]'
+            );
+
+        submitBtn.disabled = true;
+
+        submitBtn.textContent =
+            'Guardando...';
+
+        try {
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                'placa',
+                document.getElementById(
+                    'placa'
+                ).value
+            );
+
+            formData.append(
+                'marca',
+                document.getElementById(
+                    'marca'
+                ).value
+            );
+
+            formData.append(
+                'modelo',
+                document.getElementById(
+                    'modelo'
+                ).value
+            );
+
+            formData.append(
+                'anio',
+                document.getElementById(
+                    'anio'
+                ).value
+            );
+
+            const file =
+                fotoInput.files[0];
+
+            if (file) {
+
+                formData.append(
+                    'foto',
+                    file
+                );
             }
-            
-            const submitBtn = form.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Subiendo...';
-            
-            try {
-                const fileName = `tracto_${Date.now()}_${file.name}`;
-                const { data: uploadData, error: uploadError } = await supabaseClient.storage
-                    .from('archivos')
-                    .upload(fileName, file);
-                
-                if (uploadError) {
-                    throw new Error('Error al subir imagen: ' + uploadError.message);
-                }
-                
-                const { data: urlData } = supabaseClient.storage
-                    .from('archivos')
-                    .getPublicUrl(fileName);
-                
-                const fotoUrl = urlData.publicUrl;
-                
-                const tracto = {
-                    placa: document.getElementById('placa').value,
-                    marca: document.getElementById('marca').value || null,
-                    modelo: document.getElementById('modelo').value || null,
-                    anio: document.getElementById('anio').value ? parseInt(document.getElementById('anio').value) : null,
-                    foto_url: fotoUrl,
-                    estado: true
-                };
-                
-                const { data: tractoData, error: insertError } = await supabaseClient
-                    .from('tracto')
-                    .insert([tracto])
-                    .select();
-                
-                if (insertError) {
-                    throw new Error('Error al guardar tracto: ' + insertError.message);
-                }
-                
-                mostrarMensaje('Tracto guardado con éxito! Redirigiendo...', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'Vista_Tracto.html';
-                }, 1500);
-                
-            } catch (err) {
-                mostrarMensaje('Error: ' + err.message, 'error');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Guardar Tracto';
+
+            const response =
+                await fetch(
+                    '/api/tractos',
+                    {
+                        method: 'POST',
+                        body: formData
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message
+                );
             }
-        });
+
+            mostrarMensaje(
+                'Tracto guardado con éxito',
+                'success'
+            );
+
+            setTimeout(() => {
+
+                window.location.href =
+                    'Vista_Tracto.html';
+
+            }, 1000);
+
+        } catch (err) {
+
+            mostrarMensaje(
+                err.message,
+                'error'
+            );
+
+            submitBtn.disabled =
+                false;
+
+            submitBtn.textContent =
+                'Guardar Tracto';
+        }
+    }
+);
         
         function mostrarMensaje(texto, tipo) {
             mensaje.textContent = texto;

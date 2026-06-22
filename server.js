@@ -73,7 +73,16 @@ const uploadDocumentosTracto =
     multer({
         storage: storageDocumentosTracto
     });
+// ==========================
+// SUBIDA FOTO TRACTO
+// ==========================
+const storageTractos =
+    multer.memoryStorage();
 
+const uploadTractos =
+    multer({
+        storage: storageTractos
+    });
 // ==========================
 // CONEXIÓN POSTGRES
 // ==========================
@@ -1488,6 +1497,100 @@ app.put(
                 success: false,
                 message:
                     error.message
+            });
+        }
+    }
+);
+/////AGREGAR TRACTOS SOLO
+// ==========================
+// AGREGAR TRACTO
+// ==========================
+app.post(
+    '/api/tractos',
+    uploadTractos.single('foto'),
+    async (req, res) => {
+
+        try {
+
+            let fotoUrl = null;
+
+            if (req.file) {
+
+                const fileName =
+                    `tracto_${Date.now()}.webp`;
+
+                const filePath =
+                    path.join(
+                        __dirname,
+                        'uploads',
+                        'tractos',
+                        fileName
+                    );
+
+                await sharp(
+                    req.file.buffer
+                )
+                    .resize({
+                        width: 900,
+                        withoutEnlargement: true
+                    })
+                    .webp({
+                        quality: 75
+                    })
+                    .toFile(
+                        filePath
+                    );
+
+                fotoUrl =
+                    `${BASE_URL}/uploads/tractos/${fileName}`;
+            }
+
+            const {
+                placa,
+                marca,
+                modelo,
+                anio
+            } = req.body;
+
+            const result =
+                await pool.query(
+                    `
+                    INSERT INTO tracto
+                    (
+                        placa,
+                        marca,
+                        modelo,
+                        anio,
+                        foto_url,
+                        estado
+                    )
+                    VALUES
+                    (
+                        $1,$2,$3,$4,$5,true
+                    )
+                    RETURNING *
+                    `,
+                    [
+                        placa,
+                        marca || null,
+                        modelo || null,
+                        anio || null,
+                        fotoUrl
+                    ]
+                );
+
+            res.json({
+                success: true,
+                tracto: result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message: error.message
             });
         }
     }
