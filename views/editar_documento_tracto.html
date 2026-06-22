@@ -172,10 +172,9 @@
 
             document.getElementById('idDocumento').value = idDocumentoEdit;
         }
-
-      async function cargarTractos() {
+async function cargarTractos() {
     try {
-        const response = await fetch('http://localhost:3000/api/tractos-activos');
+        const response = await fetch('/api/tractos-activos');  // ✅ URL relativa
         const tractosData = await response.json();
 
         const select = document.getElementById('idTracto');
@@ -193,7 +192,7 @@
 
 async function cargarTiposDocumento() {
     try {
-        const response = await fetch('http://localhost:3000/api/tipos-documento-tracto');
+        const response = await fetch('/api/tipos-documento-tracto');  // ✅ URL relativa
         const tiposData = await response.json();
 
         const select = document.getElementById('idTipoDocumento');
