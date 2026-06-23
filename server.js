@@ -447,8 +447,8 @@ app.post(
                         filePath
                     );
 
-              fotoUrl =
-`${BASE_URL}/uploads/conductores/${fileName}`;
+                fotoUrl =
+                    `${BASE_URL}/uploads/conductores/${fileName}`;
             }
 
             const {
@@ -614,7 +614,7 @@ app.put(
                     );
 
                 fotoUrl =
-    `${BASE_URL}/uploads/conductores/${fileName}`;
+                    `${BASE_URL}/uploads/conductores/${fileName}`;
             }
 
             const {
@@ -1082,7 +1082,7 @@ app.put(
                 `SELECT archivo_url FROM documento_conductor WHERE id_documento = $1`,
                 [id]
             );
-            
+
             let archivoUrl = checkResult.rows[0]?.archivo_url; // ✅ Valor actual por defecto
 
             // ✅ Si se SUBIÓ un NUEVO archivo, usar el nuevo
@@ -1091,7 +1091,7 @@ app.put(
                 console.log("  - fieldname:", req.file.fieldname);
                 console.log("  - originalname:", req.file.originalname);
                 console.log("  - filename:", req.file.filename);
-                
+
                 archivoUrl = `${BASE_URL}/uploads/documentos/${req.file.filename}`;
             } else {
                 console.log("⚠️ req.file es NULL - No se subió archivo");
@@ -1187,7 +1187,7 @@ app.get('/api/documentos', async (req, res) => {
 app.get('/api/documentos/:id', async (req, res) => {
     try {
         const id = parseInt(req.params.id);
-        
+
         if (!id) {
             return res.status(400).json({
                 success: false,
@@ -1396,7 +1396,7 @@ const uploadPdfTracto =
     multer({
         storage: storagePdfTracto
     });
-    // ==========================
+// ==========================
 // AGREGAR DOCUMENTO TRACTO
 // ==========================
 app.post(
@@ -2272,7 +2272,7 @@ app.put(
             });
         }
     }
-);async function cargarCarretas() {
+); async function cargarCarretas() {
 
     try {
 
@@ -2313,7 +2313,7 @@ app.put(
 
         console.error(error);
     }
-}async function cargarDocumentos() {
+} async function cargarDocumentos() {
 
     const tbody =
         document.getElementById(
@@ -2411,8 +2411,8 @@ app.post(
                         id_carreta,
                         id_tipo_documento,
                         archivoUrl,
-                        fecha_emision,
-                        fecha_vencimiento || null,
+                        fecha_emision || null,
+                        !fecha_vencimiento ? null : fecha_vencimiento,
                         observacion || null
                     ]
                 );
