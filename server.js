@@ -2621,6 +2621,92 @@ app.put(
         }
     }
 );
+
+app.get(
+    '/api/documentos-empresa',
+    async (req, res) => {
+
+        try {
+
+            const result =
+                await pool.query(`
+                    SELECT
+                        d.id_documento,
+                        d.id_tipo_documento,
+                        d.archivo_url,
+                        d.fecha_emision,
+                        d.fecha_vencimiento,
+                        d.estado,
+                        d.observacion,
+
+                        td.nombre
+                            AS tipo_documento_nombre
+
+                    FROM documento_empresa d
+
+                    LEFT JOIN tipo_documento td
+                        ON td.id_tipo_documento =
+                           d.id_tipo_documento
+
+                    ORDER BY d.id_documento DESC
+                `);
+
+            res.json(
+                result.rows
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
+app.put(
+    '/api/documentos-empresa/:id/estado',
+    async (req, res) => {
+
+        try {
+
+            const { id } =
+                req.params;
+
+            const { estado } =
+                req.body;
+
+            await pool.query(
+                `
+                UPDATE documento_empresa
+                SET estado = $1
+                WHERE id_documento = $2
+                `,
+                [
+                    estado,
+                    id
+                ]
+            );
+
+            res.json({
+                success: true
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================

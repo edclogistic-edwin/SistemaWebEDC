@@ -81,47 +81,66 @@
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <script src="../js/dropdown.js"></script>
     <script>
-        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
         let todosLosDocumentos = [];
         
         async function cargarDocumentos() {
-            const tbody = document.getElementById('tablaEmpresaDoc');
-            
-            // JOIN con tipo_documento (NO hay conductor/tracto/carreta)
-            const { data, error } = await supabaseClient
-                .from('documento_empresa')
-                .select(`
-                    id_documento,
-                    id_tipo_documento,
-                    archivo_url,
-                    fecha_emision,
-                    fecha_vencimiento,
-                    estado,
-                    observacion,
-                    tipo_documento: id_tipo_documento (nombre)
-                `)
-                .order('id_documento', { ascending: false });
-            
-            if (error) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: red;">Error: ' + error.message + '</td></tr>';
-                return;
-            }
-            
-            todosLosDocumentos = data;
-            
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8">No hay documentos registrados</td></tr>';
-                return;
-            }
-            
-            mostrarDocumentos(data);
+
+    const tbody =
+        document.getElementById(
+            'tablaEmpresaDoc'
+        );
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/documentos-empresa'
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message
+            );
         }
+
+        todosLosDocumentos =
+            data;
+
+        if (data.length === 0) {
+
+            tbody.innerHTML =
+                '<tr><td colspan="8">No hay documentos registrados</td></tr>';
+
+            return;
+        }
+
+        mostrarDocumentos(
+            data
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        tbody.innerHTML =
+            `<tr>
+                <td colspan="8"
+                    style="
+                        text-align:center;
+                        color:red;
+                        padding:40px;
+                    ">
+                    Error: ${error.message}
+                </td>
+            </tr>`;
+    }
+}
         
         // FUNCI�"N para calcular estado de vencimiento (Activo/Vence pronto/Vencido)
         function obtenerEstadoVencimiento(fechaVencimientoStr) {
@@ -206,21 +225,50 @@
             }).join('');
         }
         
-        async function toggleEstadoDocumento(idDocumento, estadoActual) {
-            const nuevoEstado = !estadoActual;
-            
-            const { error } = await supabaseClient
-                .from('documento_empresa')
-                .update({ estado: nuevoEstado })
-                .eq('id_documento', idDocumento);
-            
-            if (error) {
-                alert('Error: ' + error.message);
-                return;
-            }
-            
-            cargarDocumentos();
+     async function toggleEstadoDocumento(
+    idDocumento,
+    estadoActual
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/documentos-empresa/${idDocumento}/estado`,
+                {
+                    method: 'PUT',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body: JSON.stringify({
+                        estado: !estadoActual
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message
+            );
         }
+
+        cargarDocumentos();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message
+        );
+    }
+}
         
         function filtrarDocumentos() {
             const termino = document.getElementById('buscador').value.toLowerCase().trim();

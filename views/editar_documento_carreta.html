@@ -172,54 +172,54 @@
             document.getElementById('idDocumento').value = idDocumentoEdit;
         }
 
-       async function cargarCarretas() {
+        async function cargarCarretas() {
 
-    try {
+            try {
 
-        const response =
-            await fetch('/api/carretas');
+                const response =
+                    await fetch('/api/carretas');
 
-        const data =
-            await response.json();
+                const data =
+                    await response.json();
 
-        if (!response.ok) {
-            throw new Error(data.message);
+                if (!response.ok) {
+                    throw new Error(data.message);
+                }
+
+                carretasData = data;
+
+                const select =
+                    document.getElementById(
+                        'idCarreta'
+                    );
+
+                select.innerHTML =
+                    '<option value="">Seleccionar carreta...</option>';
+
+                data.forEach(carreta => {
+
+                    const option =
+                        document.createElement('option');
+
+                    option.value =
+                        carreta.id_carreta;
+
+                    option.textContent =
+                        `${carreta.placa} - ${carreta.tipo || ''}`.trim();
+
+                    select.appendChild(option);
+
+                });
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    'Error cargando carretas'
+                );
+            }
         }
-
-        carretasData = data;
-
-        const select =
-            document.getElementById(
-                'idCarreta'
-            );
-
-        select.innerHTML =
-            '<option value="">Seleccionar carreta...</option>';
-
-        data.forEach(carreta => {
-
-            const option =
-                document.createElement('option');
-
-            option.value =
-                carreta.id_carreta;
-
-            option.textContent =
-                `${carreta.placa} - ${carreta.tipo || ''}`.trim();
-
-            select.appendChild(option);
-
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            'Error cargando carretas'
-        );
-    }
-}
 
         async function cargarTiposDocumento() {
 
