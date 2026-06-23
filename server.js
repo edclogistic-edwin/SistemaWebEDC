@@ -3107,6 +3107,107 @@ app.post(
         }
     }
 );
+app.get(
+    '/api/proveedores/:id',
+    async (req, res) => {
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT *
+                    FROM proveedor
+                    WHERE id_proveedor = $1
+                    `,
+                    [req.params.id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res.status(404).json({
+                    message:
+                        'Proveedor no encontrado'
+                });
+            }
+
+            res.json(
+                result.rows[0]
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                message:
+                    error.message
+            });
+        }
+    }
+);
+app.put(
+    '/api/proveedores/:id',
+    async (req, res) => {
+
+        try {
+
+            const {
+                ruc,
+                nombre,
+                telefono,
+                correo,
+                direccion,
+                observaciones,
+                estado
+            } = req.body;
+
+            const result =
+                await pool.query(
+                    `
+                    UPDATE proveedor
+                    SET
+                        ruc = $1,
+                        nombre = $2,
+                        telefono = $3,
+                        correo = $4,
+                        direccion = $5,
+                        observaciones = $6,
+                        estado = $7
+                    WHERE id_proveedor = $8
+                    RETURNING *
+                    `,
+                    [
+                        ruc,
+                        nombre,
+                        telefono || null,
+                        correo || null,
+                        direccion || null,
+                        observaciones || null,
+                        estado,
+                        req.params.id
+                    ]
+                );
+
+            res.json({
+                success: true,
+                proveedor:
+                    result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                message:
+                    error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="../css/style_dashboard.css">
     <link rel="stylesheet" href="../css/style_proveedor.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="nav-brand">
@@ -41,91 +43,101 @@
             <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
         </div>
     </nav>
-    
+
     <div class="container">
         <h1>Editar Proveedor</h1>
-        
+
         <div class="welcome" style="max-width: 700px;">
             <form id="formEditarProveedor">
                 <div class="form-group">
                     <label>RUC *:</label>
-                    <input type="text" id="ruc" maxlength="11" required pattern="\d{11}" placeholder="11 dígitos" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                    <input type="text" id="ruc" maxlength="11" required pattern="\d{11}" placeholder="11 dígitos"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
                     <p style="font-size: 13px; color: var(--text-light); margin-top: 4px;">Solo números, 11 dígitos</p>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Nombre *:</label>
-                    <input type="text" id="nombre" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                    <input type="text" id="nombre" required
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
                 </div>
-                
+
                 <div class="form-group">
                     <label>Teléfono:</label>
-                    <input type="text" id="telefono" placeholder="(01) 4652959" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                    <input type="text" id="telefono" placeholder="(01) 4652959"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
                 </div>
-                
+
                 <div class="form-group">
                     <label>Correo:</label>
-                    <input type="email" id="correo" placeholder="ejemplo@gmail.com" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                    <input type="email" id="correo" placeholder="ejemplo@gmail.com"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
                 </div>
-                
+
                 <div class="form-group">
                     <label>Dirección:</label>
-                    <input type="text" id="direccion" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                    <input type="text" id="direccion"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
                 </div>
-                
+
                 <div class="form-group">
                     <label>Observaciones:</label>
-                    <input type="text" id="observaciones" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                    <input type="text" id="observaciones"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
                 </div>
-                
+
                 <div class="form-group">
                     <label>Estado:</label>
-                    <select id="estado" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
+                    <select id="estado"
+                        style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 15px;">
                         <option value="true">Activo</option>
                         <option value="false">Inactivo</option>
                     </select>
                 </div>
-                
-                <button type="submit" class="btn-primary" style="padding: 12px 32px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px;">Guardar Cambios</button>
+
+                <button type="submit" class="btn-primary"
+                    style="padding: 12px 32px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px;">Guardar
+                    Cambios</button>
             </form>
-            
-            <div id="mensaje" class="error" style="display: none; margin-top: 16px; padding: 12px; border-radius: 6px;"></div>
+
+            <div id="mensaje" class="error" style="display: none; margin-top: 16px; padding: 12px; border-radius: 6px;">
+            </div>
         </div>
-        
-        <a href="Vista_Proveedor.html" style="display: inline-block; margin-top: 24px; color: var(--primary-red); text-decoration: none; font-weight: 600;">Volver a la lista de proveedores</a>
+
+        <a href="Vista_Proveedor.html"
+            style="display: inline-block; margin-top: 24px; color: var(--primary-red); text-decoration: none; font-weight: 600;">Volver
+            a la lista de proveedores</a>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
-         const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
-        // Obtener ID del proveedor desde la URL 
         const urlParams = new URLSearchParams(window.location.search);
         const idProveedor = urlParams.get('id');
-        
+
         if (!idProveedor) {
             alert('ID de proveedor no proporcionado');
             window.location.href = 'Vista_Proveedor.html';
         }
-        
+
         const form = document.getElementById('formEditarProveedor');
         const mensaje = document.getElementById('mensaje');
-        
+
         // Cargar proveedor por ID
         async function cargarProveedor() {
             try {
-                const { data, error } = await supabaseClient
-                    .from('proveedor')
-                    .select('*')
-                    .eq('id_proveedor', idProveedor)
-                    .single();
-                
-                if (error) {
-                    throw new Error('Error al cargar proveedor: ' + error.message);
+                const response =
+                    await fetch(
+                        `/api/proveedores/${idProveedor}`
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message
+                    );
                 }
-                
                 // Rellenar formulario
                 document.getElementById('ruc').value = data.ruc || '';
                 document.getElementById('nombre').value = data.nombre || '';
@@ -134,28 +146,28 @@
                 document.getElementById('direccion').value = data.direccion || '';
                 document.getElementById('observaciones').value = data.observaciones || '';
                 document.getElementById('estado').value = data.estado.toString();
-                
+
             } catch (err) {
                 mostrarMensaje('Error: ' + err.message, 'error');
             }
         }
-        
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             mensaje.style.display = 'none';
             mensaje.className = 'error';
-            
+
             // Validar RUC (11 dígitos)
             const ruc = document.getElementById('ruc').value;
             if (!/^\d{11}$/.test(ruc)) {
                 mostrarMensaje('El RUC debe tener 11 dígitos numéricos', 'error');
                 return;
             }
-            
+
             const submitBtn = form.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Guardando...';
-            
+
             try {
                 const proveedor = {
                     ruc: ruc,
@@ -166,29 +178,44 @@
                     observaciones: document.getElementById('observaciones').value || null,
                     estado: document.getElementById('estado').value === 'true'
                 };
-                
-                const { error: updateError } = await supabaseClient
-                    .from('proveedor')
-                    .update(proveedor)
-                    .eq('id_proveedor', idProveedor);
-                
-                if (updateError) {
-                    throw new Error('Error al actualizar proveedor: ' + updateError.message);
+
+                const response =
+                    await fetch(
+                        `/api/proveedores/${idProveedor}`,
+                        {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+                            body: JSON.stringify(
+                                proveedor
+                            )
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message
+                    );
                 }
-                
                 mostrarMensaje('Proveedor actualizado con éxito! Redirigiendo...', 'success');
-                
+
                 setTimeout(() => {
                     window.location.href = 'Vista_Proveedor.html';
                 }, 1500);
-                
+
             } catch (err) {
                 mostrarMensaje('Error: ' + err.message, 'error');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Guardar Cambios';
             }
         });
-        
+
         function mostrarMensaje(texto, tipo) {
             mensaje.textContent = texto;
             mensaje.style.display = 'block';
@@ -196,20 +223,21 @@
             mensaje.style.background = tipo === 'error' ? '#fee2e2' : '#d1fae5';
             mensaje.style.color = tipo === 'error' ? '#dc2626' : '#059669';
         }
-        
+
         // Cargar proveedor al iniciar
         cargarProveedor();
-        
+
         document.getElementById('logoutBtn').addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.clear();
             window.location.href = '../index.html';
         });
-        
+
         document.getElementById('perfilBtn').addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = 'Vista_Perfil.html';
         });
     </script>
 </body>
+
 </html>
