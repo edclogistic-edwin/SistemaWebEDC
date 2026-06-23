@@ -172,29 +172,54 @@
             document.getElementById('idDocumento').value = idDocumentoEdit;
         }
 
-        async function cargarCarretas() {
-            const { data, error } = await supabaseClient
-                .from('carreta')
-                .select('*')
-                .eq('estado', true)
-                .order('placa');
+       async function cargarCarretas() {
 
-            if (error) {
-                console.error('Error al cargar carretas:', error);
-                return;
-            }
+    try {
 
-            carretasData = data;
+        const response =
+            await fetch('/api/carretas');
 
-            const select = document.getElementById('idCarreta');
+        const data =
+            await response.json();
 
-            data.forEach(carreta => {
-                const option = document.createElement('option');
-                option.value = carreta.id_carreta;
-                option.textContent = `${carreta.placa} - ${carreta.tipo || ''}`.trim();
-                select.appendChild(option);
-            });
+        if (!response.ok) {
+            throw new Error(data.message);
         }
+
+        carretasData = data;
+
+        const select =
+            document.getElementById(
+                'idCarreta'
+            );
+
+        select.innerHTML =
+            '<option value="">Seleccionar carreta...</option>';
+
+        data.forEach(carreta => {
+
+            const option =
+                document.createElement('option');
+
+            option.value =
+                carreta.id_carreta;
+
+            option.textContent =
+                `${carreta.placa} - ${carreta.tipo || ''}`.trim();
+
+            select.appendChild(option);
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            'Error cargando carretas'
+        );
+    }
+}
 
         async function cargarTiposDocumento() {
 
