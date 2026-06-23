@@ -91,118 +91,159 @@
         </form>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+   
     <script src="../js/dropdown.js"></script>
     <script>
-        const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
-        let tiposDocumentoData = [];
+       let tiposDocumentoData = [];
         
         // Cargar tipos de documento (solo categoria = 'empresa')
-        async function cargarTiposDocumento() {
-            const { data, error } = await supabaseClient
-                .from('tipo_documento')
-                .select('*')
-                .eq('estado', true)
-                .eq('categoria', 'empresa')
-                .order('nombre');
-            
-            if (error) {
-                console.error('Error al cargar tipos de documento:', error);
-                return;
-            }
-            
-            tiposDocumentoData = data;
-            
-            const select = document.getElementById('idTipoDocumento');
-            
-            data.forEach(tipo => {
-                const option = document.createElement('option');
-                option.value = tipo.id_tipo_documento;
-                option.textContent = tipo.nombre;
-                select.appendChild(option);
-            });
+       async function cargarTiposDocumento() {
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/tipos-documento/empresa'
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
+
+        tiposDocumentoData =
+            data;
+
+        const select =
+            document.getElementById(
+                'idTipoDocumento'
+            );
+
+        data.forEach(tipo => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+            option.value =
+                tipo.id_tipo_documento;
+
+            option.textContent =
+                tipo.nombre;
+
+            select.appendChild(
+                option
+            );
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message
+        );
+    }
+}
         
         // Guardar documento
         async function guardarDocumento(e) {
-            e.preventDefault();
-            
-            const idTipoDocumento = document.getElementById('idTipoDocumento').value;
-            const fechaEmision = document.getElementById('fechaEmision').value;
-            const fechaVencimiento = document.getElementById('fechaVencimiento').value;
-            const observacion = document.getElementById('observacion').value;
-            const archivo = document.getElementById('archivo').files[0];
-            
-            // Validaciones
-            if (!idTipoDocumento) {
-                alert('Selecciona un tipo de documento');
-                return;
-            }
-            
-            if (!archivo) {
-                alert('Selecciona un archivo PDF');
-                return;
-            }
-            
-            if (archivo.type !== 'application/pdf') {
-                alert('Solo se permiten archivos PDF');
-                return;
-            }
-            
-            if (archivo.size > 10 * 1024 * 1024) {
-                alert('El archivo debe ser menor a 10MB');
-                return;
-            }
-            
-            // Subir archivo a Supabase Storage
-            const nombreLimpio = archivo.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-            const archivoNombre = `doc_empresa_${Date.now()}_${nombreLimpio}`;
-            
-            console.log('Subiendo archivo:', archivoNombre);
-            
-            const { error: uploadError } = await supabaseClient.storage
-                .from('archivos')
-                .upload(archivoNombre, archivo);
-            
-            if (uploadError) {
-                console.error('Error al subir:', uploadError);
-                alert('Error al subir archivo: ' + uploadError.message);
-                return;
-            }
-            
-            console.log('Archivo subido correctamente');
-            
-            const { data: publicUrlData } = supabaseClient.storage
-                .from('archivos')
-                .getPublicUrl(archivoNombre);
-            
-            const archivoUrl = publicUrlData.publicUrl;
-            console.log('URL pública:', archivoUrl);
-            
-            // Insertar en BD
-            const datos = {
-                id_tipo_documento: parseInt(idTipoDocumento),
-                archivo_url: archivoUrl,
-                fecha_emision: fechaEmision || null,
-                fecha_vencimiento: fechaVencimiento || null,
-                observacion: observacion
-            };
-            
-            const { error } = await supabaseClient
-                .from('documento_empresa')
-                .insert([datos]);
-            
-            if (error) {
-                alert('Error: ' + error.message);
-                return;
-            }
-            
-            alert('Documento agregado correctamente!');
-            window.location.href = 'Vista_Empresa_Doc.html';
+
+    e.preventDefault();
+
+    const archivo =
+        document.getElementById(
+            'archivo'
+        ).files[0];
+
+    if (!archivo) {
+
+        alert(
+            'Selecciona un PDF'
+        );
+
+        return;
+    }
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        'archivo',
+        archivo
+    );
+
+    formData.append(
+        'id_tipo_documento',
+        document.getElementById(
+            'idTipoDocumento'
+        ).value
+    );
+
+    formData.append(
+        'fecha_emision',
+        document.getElementById(
+            'fechaEmision'
+        ).value
+    );
+
+    formData.append(
+        'fecha_vencimiento',
+        document.getElementById(
+            'fechaVencimiento'
+        ).value
+    );
+
+    formData.append(
+        'observacion',
+        document.getElementById(
+            'observacion'
+        ).value
+    );
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/documentos-empresa',
+                {
+                    method: 'POST',
+                    body: formData
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
+
+        alert(
+            'Documento agregado correctamente'
+        );
+
+        window.location.href =
+            'Vista_Empresa_Doc.html';
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message
+        );
+    }
+}
         
         // EVENTOS
         document.getElementById('formularioDocumento').addEventListener('submit', guardarDocumento);

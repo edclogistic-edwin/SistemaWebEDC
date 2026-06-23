@@ -108,6 +108,31 @@ const uploadDocumentosCarreta =
             storageDocumentosCarreta
     });
 // ==========================
+// DOCUMENTOS EMPRESA
+// ==========================
+
+const storageDocumentosEmpresa =
+    multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(
+                null,
+                "uploads/documentos_empresa"
+            );
+        },
+        filename: (req, file, cb) => {
+            cb(
+                null,
+                `empresa_${Date.now()}_${file.originalname}`
+            );
+        }
+    });
+
+const uploadDocumentosEmpresa =
+    multer({
+        storage: storageDocumentosEmpresa
+    });
+    
+// ==========================
 // SUBIDA FOTO TRACTO
 // ==========================
 const storageTractos =
@@ -2693,6 +2718,109 @@ app.put(
 
             res.json({
                 success: true
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
+app.get(
+    '/api/tipos-documento/empresa',
+    async (req, res) => {
+
+        try {
+
+            const result =
+                await pool.query(`
+                    SELECT *
+                    FROM tipo_documento
+                    WHERE estado = true
+                    AND categoria = 'empresa'
+                    ORDER BY nombre
+                `);
+
+            res.json(
+                result.rows
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
+app.post(
+    '/api/documentos-empresa',
+    uploadDocumentosEmpresa.single(
+        'archivo'
+    ),
+    async (req, res) => {
+
+        try {
+
+            const {
+                id_tipo_documento,
+                fecha_emision,
+                fecha_vencimiento,
+                observacion
+            } = req.body;
+
+            let archivoUrl =
+                null;
+
+            if (req.file) {
+
+                archivoUrl =
+                    `${BASE_URL}/uploads/documentos_empresa/${req.file.filename}`;
+            }
+
+            const result =
+                await pool.query(
+                    `
+                    INSERT INTO documento_empresa
+                    (
+                        id_tipo_documento,
+                        archivo_url,
+                        fecha_emision,
+                        fecha_vencimiento,
+                        observacion,
+                        estado
+                    )
+                    VALUES
+                    (
+                        $1,$2,$3,$4,$5,true
+                    )
+                    RETURNING *
+                    `,
+                    [
+                        id_tipo_documento,
+                        archivoUrl,
+                        fecha_emision || null,
+                        fecha_vencimiento
+                            ? fecha_vencimiento
+                            : null,
+                        observacion || null
+                    ]
+                );
+
+            res.json({
+                success: true,
+                documento:
+                    result.rows[0]
             });
 
         } catch (error) {
