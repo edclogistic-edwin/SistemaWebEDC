@@ -2835,6 +2835,145 @@ app.post(
         }
     }
 );
+app.get(
+    '/api/documentos-empresa/:id',
+    async (req, res) => {
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT *
+                    FROM documento_empresa
+                    WHERE id_documento = $1
+                    `,
+                    [req.params.id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res.status(404)
+                    .json({
+                        message:
+                            'Documento no encontrado'
+                    });
+            }
+
+            res.json(
+                result.rows[0]
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500)
+                .json({
+                    message:
+                        error.message
+                });
+        }
+    }
+);
+app.put(
+    '/api/documentos-empresa/:id',
+    uploadDocumentosEmpresa.single(
+        'archivo'
+    ),
+    async (req, res) => {
+
+        try {
+
+            const {
+                id_tipo_documento,
+                fecha_emision,
+                fecha_vencimiento,
+                observacion
+            } = req.body;
+
+            let archivoUrl =
+                null;
+
+            if (req.file) {
+
+                archivoUrl =
+                    `${BASE_URL}/uploads/documentos_empresa/${req.file.filename}`;
+            }
+
+            let query = `
+                UPDATE documento_empresa
+                SET
+                    id_tipo_documento = $1,
+                    fecha_emision = $2,
+                    fecha_vencimiento = $3,
+                    observacion = $4
+            `;
+
+            const values = [
+                id_tipo_documento,
+                fecha_emision || null,
+                fecha_vencimiento === ''
+                    ? null
+                    : fecha_vencimiento,
+                observacion || null
+            ];
+
+            if (archivoUrl) {
+
+                query += `
+                    ,
+                    archivo_url = $5
+                    WHERE id_documento = $6
+                    RETURNING *
+                `;
+
+                values.push(
+                    archivoUrl
+                );
+
+                values.push(
+                    req.params.id
+                );
+
+            } else {
+
+                query += `
+                    WHERE id_documento = $5
+                    RETURNING *
+                `;
+
+                values.push(
+                    req.params.id
+                );
+            }
+
+            const result =
+                await pool.query(
+                    query,
+                    values
+                );
+
+            res.json({
+                success: true,
+                documento:
+                    result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500)
+                .json({
+                    message:
+                        error.message
+                });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================

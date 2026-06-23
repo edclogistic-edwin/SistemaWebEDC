@@ -104,13 +104,9 @@
         </form>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+     
     <script src="../js/dropdown.js"></script>
     <script>
-         const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
         let idDocumentoEdit = null;
         let tiposDocumentoData = [];
         let documentoActual = null;
@@ -141,138 +137,216 @@
             document.getElementById('idDocumento').value = idDocumentoEdit;
         }
         
-        async function cargarTiposDocumento() {
-            const { data, error } = await supabaseClient
-                .from('tipo_documento')
-                .select('*')
-                .eq('estado', true)
-                .eq('categoria', 'empresa')
-                .order('nombre');
-            
-            if (error) {
-                console.error('Error al cargar tipos de documento:', error);
-                return;
-            }
-            
-            tiposDocumentoData = data;
-            
-            const select = document.getElementById('idTipoDocumento');
-            
-            data.forEach(tipo => {
-                const option = document.createElement('option');
-                option.value = tipo.id_tipo_documento;
-                option.textContent = tipo.nombre;
-                select.appendChild(option);
-            });
+     async function cargarTiposDocumento() {
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/tipos-documento/empresa'
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
+
+        tiposDocumentoData =
+            data;
+
+        const select =
+            document.getElementById(
+                'idTipoDocumento'
+            );
+
+        data.forEach(tipo => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+            option.value =
+                tipo.id_tipo_documento;
+
+            option.textContent =
+                tipo.nombre;
+
+            select.appendChild(
+                option
+            );
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            'Error cargando tipos de documento'
+        );
+    }
+}
         
-        async function cargarDocumento() {
-            const { data, error } = await supabaseClient
-                .from('documento_empresa')
-                .select(`
-                    id_documento,
-                    id_tipo_documento,
-                    archivo_url,
-                    fecha_emision,
-                    fecha_vencimiento,
-                    observacion
-                `)
-                .eq('id_documento', idDocumentoEdit)
-                .single();
-            
-            if (error) {
-                console.error('Error al cargar documento:', error);
-                alert('Error: ' + error.message);
-                window.location.href = 'Vista_Empresa_Doc.html';
-                return;
-            }
-            
-            documentoActual = data;
-            
-            console.log('Datos cargados:', data);
-            
-            document.getElementById('idTipoDocumento').value = data.id_tipo_documento;
-            document.getElementById('fechaEmision').value = data.fecha_emision ? data.fecha_emision.slice(0, 10) : '';
-            document.getElementById('fechaVencimiento').value = data.fecha_vencimiento ? data.fecha_vencimiento.slice(0, 10) : '';
-            document.getElementById('observacion').value = data.observacion || '';
-            
-            const archivoActualDiv = document.getElementById('archivoActual');
-            if (data.archivo_url) {
-                archivoActualDiv.innerHTML = `
-                    <a href="${data.archivo_url}" target="_blank" style="color: #0ea5e9; font-weight: 600;">
-                        Ver PDF actual
-                    </a>
-                `;
-            } else {
-                archivoActualDiv.textContent = 'No hay archivo cargado';
-            }
+       async function cargarDocumento() {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/documentos-empresa/${idDocumentoEdit}`
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
-        
+
+        documentoActual =
+            data;
+
+        document.getElementById(
+            'idTipoDocumento'
+        ).value =
+            data.id_tipo_documento;
+
+        document.getElementById(
+            'fechaEmision'
+        ).value =
+            data.fecha_emision || '';
+
+        document.getElementById(
+            'fechaVencimiento'
+        ).value =
+            data.fecha_vencimiento || '';
+
+        document.getElementById(
+            'observacion'
+        ).value =
+            data.observacion || '';
+
+        const archivoActualDiv =
+            document.getElementById(
+                'archivoActual'
+            );
+
+        if (data.archivo_url) {
+
+            archivoActualDiv.innerHTML =
+                `
+                <a href="${data.archivo_url}"
+                   target="_blank">
+                   Ver PDF actual
+                </a>
+            `;
+        }
+        else {
+
+            archivoActualDiv.innerHTML =
+                'No hay archivo cargado';
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+    }
+}
         async function guardarDocumento(e) {
-            e.preventDefault();
-            
-            const idTipoDocumento = document.getElementById('idTipoDocumento').value;
-            const fechaEmision = document.getElementById('fechaEmision').value;
-            const fechaVencimiento = document.getElementById('fechaVencimiento').value;
-            const observacion = document.getElementById('observacion').value;
-            const archivoNuevo = document.getElementById('archivoNuevo').files[0];
-            
-            if (!idTipoDocumento) {
-                alert('Selecciona un tipo de documento');
-                return;
-            }
-            
-            const datos = {
-                id_tipo_documento: parseInt(idTipoDocumento),
-                fecha_emision: fechaEmision || null,
-                fecha_vencimiento: fechaVencimiento || null,
-                observacion: observacion
-            };
-            
-            if (archivoNuevo) {
-                if (archivoNuevo.type !== 'application/pdf') {
-                    alert('Solo se permiten archivos PDF');
-                    return;
+
+    e.preventDefault();
+
+    const formData =
+        new FormData();
+
+    const archivoNuevo =
+        document.getElementById(
+            'archivoNuevo'
+        ).files[0];
+
+    if (archivoNuevo) {
+
+        formData.append(
+            'archivo',
+            archivoNuevo
+        );
+    }
+
+    formData.append(
+        'id_tipo_documento',
+        document.getElementById(
+            'idTipoDocumento'
+        ).value
+    );
+
+    formData.append(
+        'fecha_emision',
+        document.getElementById(
+            'fechaEmision'
+        ).value
+    );
+
+    formData.append(
+        'fecha_vencimiento',
+        document.getElementById(
+            'fechaVencimiento'
+        ).value
+    );
+
+    formData.append(
+        'observacion',
+        document.getElementById(
+            'observacion'
+        ).value
+    );
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/documentos-empresa/${idDocumentoEdit}`,
+                {
+                    method: 'PUT',
+                    body: formData
                 }
-                
-                const nombreLimpio = archivoNuevo.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-                const archivoNombre = `documento_empresa_${idDocumentoEdit}_${nombreLimpio}`;
-                
-                console.log('Subiendo archivo:', archivoNombre);
-                
-                const { error: uploadError } = await supabaseClient.storage
-                    .from('archivos')
-                    .upload(archivoNombre, archivoNuevo);
-                
-                if (uploadError) {
-                    console.error('Error al subir:', uploadError);
-                    alert('Error al subir archivo: ' + uploadError.message);
-                    return;
-                }
-                
-                console.log('Archivo subido correctamente');
-                
-                const { data: publicUrlData } = supabaseClient.storage
-                    .from('archivos')
-                    .getPublicUrl(archivoNombre);
-                
-                datos.archivo_url = publicUrlData.publicUrl;
-                console.log('URL pública:', datos.archivo_url);
-            }
-            
-            const { error } = await supabaseClient
-                .from('documento_empresa')
-                .update(datos)
-                .eq('id_documento', idDocumentoEdit);
-            
-            if (error) {
-                alert('Error: ' + error.message);
-                return;
-            }
-            
-            alert('Documento actualizado correctamente!');
-            window.location.href = 'Vista_Empresa_Doc.html';
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
+
+        alert(
+            'Documento actualizado correctamente'
+        );
+
+        window.location.href =
+            'Vista_Empresa_Doc.html';
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message
+        );
+    }
+}
         
         document.getElementById('formularioDocumento').addEventListener('submit', guardarDocumento);
         
