@@ -122,36 +122,62 @@
         const mensaje = document.getElementById('mensaje');
 
         // Cargar proveedor por ID
-        async function cargarProveedor() {
-            try {
-                const response =
-                    await fetch(
-                        `/api/proveedores/${idProveedor}`
-                    );
+     async function cargarProveedor() {
 
-                const data =
-                    await response.json();
+    try {
 
-                if (!response.ok) {
+        console.log('ID:', idProveedor);
 
-                    throw new Error(
-                        data.message
-                    );
-                }
-                // Rellenar formulario
-                document.getElementById('ruc').value = data.ruc || '';
-                document.getElementById('nombre').value = data.nombre || '';
-                document.getElementById('telefono').value = data.telefono || '';
-                document.getElementById('correo').value = data.correo || '';
-                document.getElementById('direccion').value = data.direccion || '';
-                document.getElementById('observaciones').value = data.observaciones || '';
-                document.getElementById('estado').value = data.estado.toString();
+        const response =
+            await fetch(
+                `/api/proveedores/${idProveedor}`
+            );
 
-            } catch (err) {
-                mostrarMensaje('Error: ' + err.message, 'error');
-            }
+        console.log('Status:', response.status);
+
+        const data =
+            await response.json();
+
+        console.log('Data:', data);
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
 
+        document.getElementById('ruc').value =
+            data.ruc || '';
+
+        document.getElementById('nombre').value =
+            data.nombre || '';
+
+        document.getElementById('telefono').value =
+            data.telefono || '';
+
+        document.getElementById('correo').value =
+            data.correo || '';
+
+        document.getElementById('direccion').value =
+            data.direccion || '';
+
+        document.getElementById('observaciones').value =
+            data.observaciones || '';
+
+        document.getElementById('estado').value =
+            data.estado.toString();
+
+    } catch (err) {
+
+        console.error(err);
+
+        mostrarMensaje(
+            'Error: ' + err.message,
+            'error'
+        );
+    }
+}
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             mensaje.style.display = 'none';
