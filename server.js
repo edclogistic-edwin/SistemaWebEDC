@@ -2974,6 +2974,75 @@ app.put(
         }
     }
 );
+app.get(
+    '/api/proveedores',
+    async (req, res) => {
+
+        try {
+
+            const result =
+                await pool.query(`
+                    SELECT *
+                    FROM proveedor
+                    ORDER BY id_proveedor DESC
+                `);
+
+            res.json(
+                result.rows
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                message:
+                    error.message
+            });
+        }
+    }
+);
+app.put(
+    '/api/proveedores/:id/estado',
+    async (req, res) => {
+
+        try {
+
+            const {
+                estado
+            } = req.body;
+
+            const result =
+                await pool.query(
+                    `
+                    UPDATE proveedor
+                    SET estado = $1
+                    WHERE id_proveedor = $2
+                    RETURNING *
+                    `,
+                    [
+                        estado,
+                        req.params.id
+                    ]
+                );
+
+            res.json({
+                success: true,
+                proveedor:
+                    result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                message:
+                    error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================

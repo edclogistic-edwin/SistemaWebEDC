@@ -88,39 +88,71 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/dropdown.js"></script>
+     <script src="../js/dropdown.js"></script>
     <script>
-       const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        let todosLosProveedores = [];
+      let todosLosProveedores = [];
 
         async function cargarProveedores() {
-            const tbody = document.getElementById('tablaProveedores');
 
-            const { data, error } = await supabaseClient
-                .from('proveedor')
-                .select('*')
-                .order('id_proveedor', { ascending: false });
+    const tbody =
+        document.getElementById(
+            'tablaProveedores'
+        );
 
-            console.log('Data:', data);
-            console.log('Error:', error);
+    try {
 
-            if (error) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: red;">Error: ' + error.message + '</td></tr>';
-                return;
-            }
+        const response =
+            await fetch(
+                '/api/proveedores'
+            );
 
-            todosLosProveedores = data;
+        const data =
+            await response.json();
 
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9">No hay proveedores registrados</td></tr>';
-                return;
-            }
+        if (!response.ok) {
 
-            mostrarProveedores(data);
+            throw new Error(
+                data.message
+            );
         }
+
+        todosLosProveedores =
+            data;
+
+        if (data.length === 0) {
+
+            tbody.innerHTML =
+                `<tr>
+                    <td colspan="9">
+                        No hay proveedores registrados
+                    </td>
+                </tr>`;
+
+            return;
+        }
+
+        mostrarProveedores(
+            data
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        tbody.innerHTML =
+            `<tr>
+                <td colspan="9"
+                    style="
+                        text-align:center;
+                        color:red;
+                        padding:40px;
+                    ">
+                    Error:
+                    ${error.message}
+                </td>
+            </tr>`;
+    }
+}
 
         function mostrarProveedores(proveedores) {
             const tbody = document.getElementById('tablaProveedores');
