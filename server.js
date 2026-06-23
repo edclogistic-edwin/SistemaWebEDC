@@ -2133,6 +2133,201 @@ app.get('/api/tipos-documento-tracto', async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+// ==========================
+// LISTAR DOCUMENTOS CARRETA
+// ==========================
+app.get('/api/documentos-carreta', async (req, res) => {
+
+    try {
+
+        const result = await pool.query(`
+            SELECT
+                dc.id_documento,
+                dc.id_carreta,
+                dc.id_tipo_documento,
+                dc.archivo_url,
+                dc.fecha_emision,
+                dc.fecha_vencimiento,
+                dc.estado,
+                dc.observacion,
+
+                c.placa AS carreta_placa,
+                c.tipo AS carreta_tipo,
+
+                td.nombre AS tipo_documento
+
+            FROM documento_carreta dc
+
+            INNER JOIN carreta c
+                ON c.id_carreta = dc.id_carreta
+
+            INNER JOIN tipo_documento td
+                ON td.id_tipo_documento = dc.id_tipo_documento
+
+            ORDER BY dc.id_documento DESC
+        `);
+
+        res.json(result.rows);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});// ==========================
+// LISTAR CARRETAS ACTIVAS
+// ==========================
+app.get('/api/carretas/activas', async (req, res) => {
+
+    try {
+
+        const result = await pool.query(`
+            SELECT *
+            FROM carreta
+            WHERE estado = true
+            ORDER BY placa
+        `);
+
+        res.json(result.rows);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+});// ==========================
+// CAMBIAR ESTADO DOCUMENTO
+// ==========================
+app.put(
+    '/api/documentos-carreta/:id/estado',
+    async (req, res) => {
+
+        try {
+
+            const { id } = req.params;
+            const { estado } = req.body;
+
+            await pool.query(
+                `
+                UPDATE documento_carreta
+                SET estado = $1
+                WHERE id_documento = $2
+                `,
+                [estado, id]
+            );
+
+            res.json({
+                success: true
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message: error.message
+            });
+        }
+    }
+);async function cargarCarretas() {
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/carretas/activas'
+            );
+
+        const data =
+            await response.json();
+
+        carretasData = data;
+
+        const filtroCarreta =
+            document.getElementById(
+                'filtroCarreta'
+            );
+
+        data.forEach(carreta => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+            option.value =
+                carreta.id_carreta;
+
+            option.textContent =
+                `${carreta.placa} - ${carreta.tipo || ''}`.trim();
+
+            filtroCarreta.appendChild(
+                option
+            );
+        });
+
+    } catch (error) {
+
+        console.error(error);
+    }
+}async function cargarDocumentos() {
+
+    const tbody =
+        document.getElementById(
+            'tablaCarretaDoc'
+        );
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/documentos-carreta'
+            );
+
+        const data =
+            await response.json();
+
+        todosLosDocumentos =
+            data;
+
+        if (data.length === 0) {
+
+            tbody.innerHTML =
+                '<tr><td colspan="9">No hay documentos registrados</td></tr>';
+
+            return;
+        }
+
+        mostrarDocumentos(
+            data
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        tbody.innerHTML =
+            `<tr>
+                <td colspan="9"
+                    style="
+                        text-align:center;
+                        color:red;
+                        padding:40px;
+                    ">
+                    Error: ${error.message}
+                </td>
+            </tr>`;
+    }
+}
 // ====================================
 // INICIAR SERVIDOR
 // ====================================
