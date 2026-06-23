@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="../css/style_dashboard.css">
     <link rel="stylesheet" href="../css/style_conductor_doc.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="nav-brand">
@@ -15,8 +17,8 @@
         </div>
         <div class="nav-menu">
             <a href="dashboard.html">Inicio</a>
-            
-          <div class="dropdown">
+
+            <div class="dropdown">
                 <button class="dropbtn">Administracion </button>
                 <div class="dropdown-content">
                     <a href="Vista_Conductor.html">Conductores</a>
@@ -42,131 +44,150 @@
             <a href="#" id="logoutBtn" class="nav-link logout">Cerrar Sesión</a>
         </div>
     </nav>
-    
+
     <div class="container">
         <h1>Editar Documento del Carreta</h1>
-        
+
         <div id="cargando" style="text-align: center; padding: 40px; font-size: 18px; color: #666;">
             Cargando datos del documento...
         </div>
-        
+
         <form id="formularioDocumento" style="display: none;">
             <!-- ID (solo lectura) -->
             <div style="margin-bottom: 20px;">
-                <label for="idDocumento" style="display: block; margin-bottom: 8px; font-weight: 600;">ID Documento</label>
-                <input type="text" id="idDocumento" readonly style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #f5f5f5;">
+                <label for="idDocumento" style="display: block; margin-bottom: 8px; font-weight: 600;">ID
+                    Documento</label>
+                <input type="text" id="idDocumento" readonly
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; background: #f5f5f5;">
             </div>
-            
+
             <!-- Carreta -->
             <div style="margin-bottom: 20px;">
                 <label for="idCarreta" style="display: block; margin-bottom: 8px; font-weight: 600;">Carreta *</label>
-                <select id="idCarreta" required style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <select id="idCarreta" required
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
                     <option value="">Seleccionar carreta...</option>
                 </select>
             </div>
-            
+
             <!-- Tipo de Documento -->
             <div style="margin-bottom: 20px;">
-                <label for="idTipoDocumento" style="display: block; margin-bottom: 8px; font-weight: 600;">Tipo de Documento *</label>
-                <select id="idTipoDocumento" required style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <label for="idTipoDocumento" style="display: block; margin-bottom: 8px; font-weight: 600;">Tipo de
+                    Documento *</label>
+                <select id="idTipoDocumento" required
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
                     <option value="">Seleccionar tipo de documento...</option>
                 </select>
             </div>
-            
+
             <!-- Fecha Emisión -->
             <div style="margin-bottom: 20px;">
-                <label for="fechaEmision" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha Emisión *</label>
-                <input type="date" id="fechaEmision"  style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <label for="fechaEmision" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha Emisión
+                    *</label>
+                <input type="date" id="fechaEmision"
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
             </div>
-            
+
             <!-- Fecha Vencimiento -->
             <div style="margin-bottom: 20px;">
-                <label for="fechaVencimiento" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha Vencimiento</label>
-                <input type="date" id="fechaVencimiento" style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
-                <small style="color: #666; margin-top: 4px; display: block;">Opcional si el tipo de documento no requiere vencimiento</small>
+                <label for="fechaVencimiento" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha
+                    Vencimiento</label>
+                <input type="date" id="fechaVencimiento"
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <small style="color: #666; margin-top: 4px; display: block;">Opcional si el tipo de documento no
+                    requiere vencimiento</small>
             </div>
-            
+
             <!-- Archivo -->
-            <div style="margin-bottom: 20px;">
-                <label for="archivoActual" style="display: block; margin-bottom: 8px; font-weight: 600;">Archivo actual</label>
-                <div id="archivoActual" style="padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 12px;">
-                    No hay archivo cargado
-                </div>
-                <label for="archivoNuevo" style="display: block; margin-bottom: 8px; font-weight: 600;">Cambiar archivo (PDF)</label>
-                <input type="file" id="archivoNuevo" accept=".pdf" style="width: 100%;">
-                <small style="color: #666; margin-top: 4px; display: block;">Solo archivos PDF. Si no seleccionas nada, se mantiene el archivo actual.</small>
+            <div style="display: block; margin-bottom: 8px; font-weight: 600;">
+                Archivo actual
             </div>
-            
+
+            <div id="archivoActual"
+                style="padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 12px;">
+                No hay archivo cargado
+            </div>
+
+            <label for="archivoNuevo" style="display: block; margin-bottom: 8px; font-weight: 600;">
+                Cambiar archivo (PDF)
+            </label>
+
+            <input type="file" id="archivoNuevo" accept=".pdf" style="width: 100%;">
+
+            <small style="color: #666; margin-top: 4px; display: block;">
+                Solo archivos PDF. Si no seleccionas nada, se mantiene el archivo actual.
+            </small>
             <!-- Observación -->
             <div style="margin-bottom: 20px;">
-                <label for="observacion" style="display: block; margin-bottom: 8px; font-weight: 600;">Observación</label>
-                <textarea id="observacion" rows="4" placeholder="Escribe una observación..." style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif;"></textarea>
+                <label for="observacion"
+                    style="display: block; margin-bottom: 8px; font-weight: 600;">Observación</label>
+                <textarea id="observacion" rows="4" placeholder="Escribe una observación..."
+                    style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; font-family: 'Inter', sans-serif;"></textarea>
             </div>
-            
+
             <!-- Botones -->
             <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 30px;">
-                <button type="button" id="btnCancelar" style="padding: 12px 24px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #333; font-size: 15px; font-weight: 600; cursor: pointer;">Cancelar</button>
-                <button type="submit" id="btnGuardar" style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Guardar cambios</button>
+                <button type="button" id="btnCancelar"
+                    style="padding: 12px 24px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #333; font-size: 15px; font-weight: 600; cursor: pointer;">Cancelar</button>
+                <button type="submit" id="btnGuardar"
+                    style="padding: 12px 24px; border: none; border-radius: 8px; background: var(--primary-red); color: white; font-size: 15px; font-weight: 600; cursor: pointer;">Guardar
+                    cambios</button>
             </div>
         </form>
     </div>
-    
-     <script src="../js/dropdown.js"></script>
+
+    <script src="../js/dropdown.js"></script>
     <script>
-         const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        
         let idDocumentoEdit = null;
         let carretasData = [];
         let tiposDocumentoData = [];
         let documentoActual = null;
-        
+
         // Función inicializar async que espera todo
         async function inicializar() {
             cargarIdDocumento();
-            
+
             await Promise.all([
                 cargarCarretas(),
                 cargarTiposDocumento()
             ]);
-            
+
             await cargarDocumento();
-            
+
             // Mostrar formulario DESPU�?S de cargar datos
             document.getElementById('cargando').style.display = 'none';
             document.getElementById('formularioDocumento').style.display = 'block';
         }
-        
+
         function cargarIdDocumento() {
             const urlParams = new URLSearchParams(window.location.search);
             idDocumentoEdit = urlParams.get('id');
-            
+
             if (!idDocumentoEdit) {
                 alert('Error: No se especificó el ID del documento');
                 window.location.href = 'Vista_Carreta_Doc.html';
                 return;
             }
-            
+
             document.getElementById('idDocumento').value = idDocumentoEdit;
         }
-        
+
         async function cargarCarretas() {
             const { data, error } = await supabaseClient
                 .from('carreta')
                 .select('*')
                 .eq('estado', true)
                 .order('placa');
-            
+
             if (error) {
                 console.error('Error al cargar carretas:', error);
                 return;
             }
-            
+
             carretasData = data;
-            
+
             const select = document.getElementById('idCarreta');
-            
+
             data.forEach(carreta => {
                 const option = document.createElement('option');
                 option.value = carreta.id_carreta;
@@ -174,304 +195,305 @@
                 select.appendChild(option);
             });
         }
-        
+
         async function cargarTiposDocumento() {
 
-    try {
+            try {
 
-        const response =
-            await fetch(
-                '/api/tipos-documento/carreta'
-            );
+                const response =
+                    await fetch(
+                        '/api/tipos-documento/carreta'
+                    );
 
-        const data =
-            await response.json();
+                const data =
+                    await response.json();
 
-        if (!response.ok) {
+                if (!response.ok) {
 
-            throw new Error(
-                data.message
-            );
+                    throw new Error(
+                        data.message
+                    );
+                }
+
+                const select =
+                    document.getElementById(
+                        'idTipoDocumento'
+                    );
+
+                data.forEach(tipo => {
+
+                    const option =
+                        document.createElement(
+                            'option'
+                        );
+
+                    option.value =
+                        tipo.id_tipo_documento;
+
+                    option.textContent =
+                        tipo.nombre;
+
+                    select.appendChild(
+                        option
+                    );
+                });
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    error.message
+                );
+            }
         }
 
-        const select =
-            document.getElementById(
-                'idTipoDocumento'
-            );
-
-        data.forEach(tipo => {
-
-            const option =
-                document.createElement(
-                    'option'
-                );
-
-            option.value =
-                tipo.id_tipo_documento;
-
-            option.textContent =
-                tipo.nombre;
-
-            select.appendChild(
-                option
-            );
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            error.message
-        );
-    }
-}
-        
         async function cargarCarretas() {
 
-    try {
+            try {
 
-        const response =
-            await fetch(
-                '/api/carretas'
-            );
+                const response =
+                    await fetch(
+                        '/api/carretas'
+                    );
 
-        const data =
-            await response.json();
+                const data =
+                    await response.json();
 
-        if (!response.ok) {
+                if (!response.ok) {
 
-            throw new Error(
-                data.message
-            );
-        }
+                    throw new Error(
+                        data.message
+                    );
+                }
 
-        const select =
-            document.getElementById(
-                'idCarreta'
-            );
+                const select =
+                    document.getElementById(
+                        'idCarreta'
+                    );
 
-        data.forEach(carreta => {
+                data.forEach(carreta => {
 
-            const option =
-                document.createElement(
-                    'option'
+                    const option =
+                        document.createElement(
+                            'option'
+                        );
+
+                    option.value =
+                        carreta.id_carreta;
+
+                    option.textContent =
+                        `${carreta.placa} - ${carreta.tipo || ''}`.trim();
+
+                    select.appendChild(
+                        option
+                    );
+                });
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    error.message
                 );
-
-            option.value =
-                carreta.id_carreta;
-
-            option.textContent =
-                `${carreta.placa} - ${carreta.tipo || ''}`.trim();
-
-            select.appendChild(
-                option
-            );
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            error.message
-        );
-    }
-}
-async function cargarDocumento() {
-
-    try {
-
-        const response =
-            await fetch(
-                `/api/documentos-carreta/${idDocumentoEdit}`
-            );
-
-        const data =
-            await response.json();
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.message
-            );
+            }
         }
+        async function cargarDocumento() {
 
-        documentoActual =
-            data;
+            try {
 
-        document.getElementById(
-            'idCarreta'
-        ).value =
-            data.id_carreta;
+                const response =
+                    await fetch(
+                        `/api/documentos-carreta/${idDocumentoEdit}`
+                    );
 
-        document.getElementById(
-            'idTipoDocumento'
-        ).value =
-            data.id_tipo_documento;
+                const data =
+                    await response.json();
 
-        document.getElementById(
-            'fechaEmision'
-        ).value =
-            data.fecha_emision
-                ? data.fecha_emision.slice(0, 10)
-                : '';
+                if (!response.ok) {
 
-        document.getElementById(
-            'fechaVencimiento'
-        ).value =
-            data.fecha_vencimiento
-                ? data.fecha_vencimiento.slice(0, 10)
-                : '';
+                    throw new Error(
+                        data.message
+                    );
+                }
 
-        document.getElementById(
-            'observacion'
-        ).value =
-            data.observacion || '';
+                documentoActual =
+                    data;
 
-        const archivoActualDiv =
-            document.getElementById(
-                'archivoActual'
-            );
+                document.getElementById(
+                    'idCarreta'
+                ).value =
+                    data.id_carreta;
 
-        if (data.archivo_url) {
+                document.getElementById(
+                    'idTipoDocumento'
+                ).value =
+                    data.id_tipo_documento;
 
-            archivoActualDiv.innerHTML =
-                `<a href="${data.archivo_url}"
+                document.getElementById(
+                    'fechaEmision'
+                ).value =
+                    data.fecha_emision
+                        ? data.fecha_emision.slice(0, 10)
+                        : '';
+
+                document.getElementById(
+                    'fechaVencimiento'
+                ).value =
+                    data.fecha_vencimiento
+                        ? data.fecha_vencimiento.slice(0, 10)
+                        : '';
+
+                document.getElementById(
+                    'observacion'
+                ).value =
+                    data.observacion || '';
+
+                const archivoActualDiv =
+                    document.getElementById(
+                        'archivoActual'
+                    );
+
+                if (data.archivo_url) {
+
+                    archivoActualDiv.innerHTML =
+                        `<a href="${data.archivo_url}"
                     target="_blank">
                     Ver PDF actual
                 </a>`;
-        }
-        else {
-
-            archivoActualDiv.textContent =
-                'No hay archivo cargado';
-        }
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(
-            error.message
-        );
-
-        window.location.href =
-            'Vista_Carreta_Doc.html';
-    }
-}
-        
-       async function guardarDocumento(e) {
-
-    e.preventDefault();
-
-    const formData =
-        new FormData();
-
-    const archivoNuevo =
-        document.getElementById(
-            'archivoNuevo'
-        ).files[0];
-
-    if (archivoNuevo) {
-
-        formData.append(
-            'archivo',
-            archivoNuevo
-        );
-    }
-
-    formData.append(
-        'id_carreta',
-        document.getElementById(
-            'idCarreta'
-        ).value
-    );
-
-    formData.append(
-        'id_tipo_documento',
-        document.getElementById(
-            'idTipoDocumento'
-        ).value
-    );
-
-    formData.append(
-        'fecha_emision',
-        document.getElementById(
-            'fechaEmision'
-        ).value
-    );
-
-    formData.append(
-        'fecha_vencimiento',
-        document.getElementById(
-            'fechaVencimiento'
-        ).value || ''
-    );
-
-    formData.append(
-        'observacion',
-        document.getElementById(
-            'observacion'
-        ).value
-    );
-
-    try {
-
-        const response =
-            await fetch(
-                `/api/documentos-carreta/${idDocumentoEdit}`,
-                {
-                    method: 'PUT',
-                    body: formData
                 }
-            );
+                else {
 
-        const data =
-            await response.json();
+                    archivoActualDiv.textContent =
+                        'No hay archivo cargado';
+                }
 
-        if (!response.ok) {
+            } catch (error) {
 
-            throw new Error(
-                data.message
-            );
+                console.error(error);
+
+                alert(
+                    error.message
+                );
+
+                window.location.href =
+                    'Vista_Carreta_Doc.html';
+            }
         }
 
-        alert(
-            'Documento actualizado correctamente'
-        );
+        async function guardarDocumento(e) {
 
-        window.location.href =
-            'Vista_Carreta_Doc.html';
+            e.preventDefault();
 
-    } catch (error) {
+            const formData =
+                new FormData();
 
-        console.error(error);
+            const archivoNuevo =
+                document.getElementById(
+                    'archivoNuevo'
+                ).files[0];
 
-        alert(
-            error.message
-        );
-    }
-}
+            if (archivoNuevo) {
+
+                formData.append(
+                    'archivo',
+                    archivoNuevo
+                );
+            }
+
+            formData.append(
+                'id_carreta',
+                document.getElementById(
+                    'idCarreta'
+                ).value
+            );
+
+            formData.append(
+                'id_tipo_documento',
+                document.getElementById(
+                    'idTipoDocumento'
+                ).value
+            );
+
+            formData.append(
+                'fecha_emision',
+                document.getElementById(
+                    'fechaEmision'
+                ).value
+            );
+
+            formData.append(
+                'fecha_vencimiento',
+                document.getElementById(
+                    'fechaVencimiento'
+                ).value || ''
+            );
+
+            formData.append(
+                'observacion',
+                document.getElementById(
+                    'observacion'
+                ).value
+            );
+
+            try {
+
+                const response =
+                    await fetch(
+                        `/api/documentos-carreta/${idDocumentoEdit}`,
+                        {
+                            method: 'PUT',
+                            body: formData
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.message
+                    );
+                }
+
+                alert(
+                    'Documento actualizado correctamente'
+                );
+
+                window.location.href =
+                    'Vista_Carreta_Doc.html';
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    error.message
+                );
+            }
+        }
         document.getElementById('formularioDocumento').addEventListener('submit', guardarDocumento);
-        
+
         document.getElementById('btnCancelar').addEventListener('click', () => {
             window.location.href = 'Vista_Carreta_Doc.html';
         });
-        
+
         document.getElementById('logoutBtn').addEventListener('click', (e) => {
             e.preventDefault();
             localStorage.clear();
             window.location.href = '../index.html';
         });
-        
+
         document.getElementById('perfilBtn').addEventListener('click', (e) => {
             e.preventDefault();
             window.location.href = 'Vista_Perfil.html';
         });
-        
+
         // Inicializar
         inicializar();
     </script>
 </body>
+
 </html>
