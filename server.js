@@ -2453,6 +2453,174 @@ app.get(
         );
     }
 );
+
+
+
+app.get(
+    '/api/documentos-carreta/:id',
+    async (req, res) => {
+
+        try {
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT *
+                    FROM documento_carreta
+                    WHERE id_documento = $1
+                    `,
+                    [req.params.id]
+                );
+
+            if (
+                result.rows.length === 0
+            ) {
+
+                return res
+                    .status(404)
+                    .json({
+                        message:
+                            'Documento no encontrado'
+                    });
+            }
+
+            res.json(
+                result.rows[0]
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                message:
+                    error.message
+            });
+        }
+    }
+);
+app.put(
+    '/api/documentos-carreta/:id',
+    uploadDocumentosCarreta.single(
+        'archivo'
+    ),
+    async (req, res) => {
+
+        try {
+
+            const {
+                id_carreta,
+                id_tipo_documento,
+                fecha_emision,
+                fecha_vencimiento,
+                observacion
+            } = req.body;
+
+            let archivoUrl = null;
+
+            if (req.file) {
+
+                archivoUrl =
+                    `${BASE_URL}/uploads/documentos_carreta/${req.file.filename}`;
+            }
+
+            if (archivoUrl) {
+
+                await pool.query(
+                    `
+                    UPDATE documento_carreta
+                    SET
+                        id_carreta = $1,
+                        id_tipo_documento = $2,
+                        archivo_url = $3,
+                        fecha_emision = $4,
+                        fecha_vencimiento = $5,
+                        observacion = $6
+                    WHERE id_documento = $7
+                    `,
+                    [
+                        id_carreta,
+                        id_tipo_documento,
+                        archivoUrl,
+                        fecha_emision || null,
+                        fecha_vencimiento === ''
+                            ? null
+                            : fecha_vencimiento,
+                        observacion || null,
+                        req.params.id
+                    ]
+                );
+
+            } else {
+
+                await pool.query(
+                    `
+                    UPDATE documento_carreta
+                    SET
+                        id_carreta = $1,
+                        id_tipo_documento = $2,
+                        fecha_emision = $3,
+                        fecha_vencimiento = $4,
+                        observacion = $5
+                    WHERE id_documento = $6
+                    `,
+                    [
+                        id_carreta,
+                        id_tipo_documento,
+                        fecha_emision || null,
+                        fecha_vencimiento === ''
+                            ? null
+                            : fecha_vencimiento,
+                        observacion || null,
+                        req.params.id
+                    ]
+                );
+            }
+
+            res.json({
+                success: true
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                message:
+                    error.message
+            });
+        }
+    }
+);app.get(
+    '/api/tipos-documento/carreta',
+    async (req, res) => {
+
+        try {
+
+            const result =
+                await pool.query(`
+                    SELECT *
+                    FROM tipo_documento
+                    WHERE estado = true
+                    AND categoria = 'carreta'
+                    ORDER BY nombre
+                `);
+
+            res.json(
+                result.rows
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                message:
+                    error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================

@@ -76,7 +76,7 @@
             <!-- Fecha Emisión -->
             <div style="margin-bottom: 20px;">
                 <label for="fechaEmision" style="display: block; margin-bottom: 8px; font-weight: 600;">Fecha Emisión *</label>
-                <input type="date" id="fechaEmision" required style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+                <input type="date" id="fechaEmision"  style="width: 100%; padding: 12px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
             </div>
             
             <!-- Fecha Vencimiento -->
@@ -111,8 +111,7 @@
         </form>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../js/dropdown.js"></script>
+     <script src="../js/dropdown.js"></script>
     <script>
          const SUPABASE_URL = 'https://jryfzkfiutekhhxbmezs.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_of5dF0BUk5mebRvzDlRecA_Dy7GTKxU';
@@ -177,152 +176,283 @@
         }
         
         async function cargarTiposDocumento() {
-            const { data, error } = await supabaseClient
-                .from('tipo_documento')
-                .select('*')
-                .eq('estado', true)
-                .eq('categoria', 'carreta')
-                .order('nombre');
-            
-            if (error) {
-                console.error('Error al cargar tipos de documento:', error);
-                return;
-            }
-            
-            tiposDocumentoData = data;
-            
-            const select = document.getElementById('idTipoDocumento');
-            
-            data.forEach(tipo => {
-                const option = document.createElement('option');
-                option.value = tipo.id_tipo_documento;
-                option.textContent = tipo.nombre;
-                select.appendChild(option);
-            });
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/tipos-documento/carreta'
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
+
+        const select =
+            document.getElementById(
+                'idTipoDocumento'
+            );
+
+        data.forEach(tipo => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+            option.value =
+                tipo.id_tipo_documento;
+
+            option.textContent =
+                tipo.nombre;
+
+            select.appendChild(
+                option
+            );
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message
+        );
+    }
+}
         
-        async function cargarDocumento() {
-            const { data, error } = await supabaseClient
-                .from('documento_carreta')
-                .select(`
-                    id_documento,
-                    id_carreta,
-                    id_tipo_documento,
-                    archivo_url,
-                    fecha_emision,
-                    fecha_vencimiento,
-                    observacion
-                `)
-                .eq('id_documento', idDocumentoEdit)
-                .single();
-            
-            if (error) {
-                console.error('Error al cargar documento:', error);
-                alert('Error: ' + error.message);
-                window.location.href = 'Vista_Carreta_Doc.html';
-                return;
-            }
-            
-            documentoActual = data;
-            
-            console.log('Datos cargados:', data);
-            
-            document.getElementById('idCarreta').value = data.id_carreta;
-            document.getElementById('idTipoDocumento').value = data.id_tipo_documento;
-            document.getElementById('fechaEmision').value = data.fecha_emision ? data.fecha_emision.slice(0, 10) : '';
-            document.getElementById('fechaVencimiento').value = data.fecha_vencimiento ? data.fecha_vencimiento.slice(0, 10) : '';
-            document.getElementById('observacion').value = data.observacion || '';
-            
-            const archivoActualDiv = document.getElementById('archivoActual');
-            if (data.archivo_url) {
-                archivoActualDiv.innerHTML = `
-                    <a href="${data.archivo_url}" target="_blank" style="color: #0ea5e9; font-weight: 600;">
-                       Ver PDF actual
-                    </a>
-                `;
-            } else {
-                archivoActualDiv.textContent = 'No hay archivo cargado';
-            }
+        async function cargarCarretas() {
+
+    try {
+
+        const response =
+            await fetch(
+                '/api/carretas'
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
+
+        const select =
+            document.getElementById(
+                'idCarreta'
+            );
+
+        data.forEach(carreta => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+            option.value =
+                carreta.id_carreta;
+
+            option.textContent =
+                `${carreta.placa} - ${carreta.tipo || ''}`.trim();
+
+            select.appendChild(
+                option
+            );
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message
+        );
+    }
+}
+async function cargarDocumento() {
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/documentos-carreta/${idDocumentoEdit}`
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
+        }
+
+        documentoActual =
+            data;
+
+        document.getElementById(
+            'idCarreta'
+        ).value =
+            data.id_carreta;
+
+        document.getElementById(
+            'idTipoDocumento'
+        ).value =
+            data.id_tipo_documento;
+
+        document.getElementById(
+            'fechaEmision'
+        ).value =
+            data.fecha_emision
+                ? data.fecha_emision.slice(0, 10)
+                : '';
+
+        document.getElementById(
+            'fechaVencimiento'
+        ).value =
+            data.fecha_vencimiento
+                ? data.fecha_vencimiento.slice(0, 10)
+                : '';
+
+        document.getElementById(
+            'observacion'
+        ).value =
+            data.observacion || '';
+
+        const archivoActualDiv =
+            document.getElementById(
+                'archivoActual'
+            );
+
+        if (data.archivo_url) {
+
+            archivoActualDiv.innerHTML =
+                `<a href="${data.archivo_url}"
+                    target="_blank">
+                    Ver PDF actual
+                </a>`;
+        }
+        else {
+
+            archivoActualDiv.textContent =
+                'No hay archivo cargado';
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message
+        );
+
+        window.location.href =
+            'Vista_Carreta_Doc.html';
+    }
+}
         
-        async function guardarDocumento(e) {
-            e.preventDefault();
-            
-            const idCarreta = document.getElementById('idCarreta').value;
-            const idTipoDocumento = document.getElementById('idTipoDocumento').value;
-            const fechaEmision = document.getElementById('fechaEmision').value;
-            const fechaVencimiento = document.getElementById('fechaVencimiento').value;
-            const observacion = document.getElementById('observacion').value;
-            const archivoNuevo = document.getElementById('archivoNuevo').files[0];
-            
-            if (!idCarreta) {
-                alert('Selecciona una carreta');
-                return;
-            }
-            
-            if (!idTipoDocumento) {
-                alert('Selecciona un tipo de documento');
-                return;
-            }
-            
-            if (!fechaEmision) {
-                alert('Ingresa la fecha de emisión');
-                return;
-            }
-            
-            const datos = {
-                id_carreta: parseInt(idCarreta),
-                id_tipo_documento: parseInt(idTipoDocumento),
-                fecha_emision: fechaEmision,
-                fecha_vencimiento: fechaVencimiento || null,
-                observacion: observacion
-            };
-            
-            if (archivoNuevo) {
-                if (archivoNuevo.type !== 'application/pdf') {
-                    alert('Solo se permiten archivos PDF');
-                    return;
+       async function guardarDocumento(e) {
+
+    e.preventDefault();
+
+    const formData =
+        new FormData();
+
+    const archivoNuevo =
+        document.getElementById(
+            'archivoNuevo'
+        ).files[0];
+
+    if (archivoNuevo) {
+
+        formData.append(
+            'archivo',
+            archivoNuevo
+        );
+    }
+
+    formData.append(
+        'id_carreta',
+        document.getElementById(
+            'idCarreta'
+        ).value
+    );
+
+    formData.append(
+        'id_tipo_documento',
+        document.getElementById(
+            'idTipoDocumento'
+        ).value
+    );
+
+    formData.append(
+        'fecha_emision',
+        document.getElementById(
+            'fechaEmision'
+        ).value
+    );
+
+    formData.append(
+        'fecha_vencimiento',
+        document.getElementById(
+            'fechaVencimiento'
+        ).value || ''
+    );
+
+    formData.append(
+        'observacion',
+        document.getElementById(
+            'observacion'
+        ).value
+    );
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/documentos-carreta/${idDocumentoEdit}`,
+                {
+                    method: 'PUT',
+                    body: formData
                 }
-                
-                const nombreLimpio = archivoNuevo.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-                const archivoNombre = `documento_carreta_${idDocumentoEdit}_${nombreLimpio}`;
-                
-                console.log('Subiendo archivo:', archivoNombre);
-                
-                const { error: uploadError } = await supabaseClient.storage
-                    .from('archivos')
-                    .upload(archivoNombre, archivoNuevo);
-                
-                if (uploadError) {
-                    console.error('Error al subir:', uploadError);
-                    alert('Error al subir archivo: ' + uploadError.message);
-                    return;
-                }
-                
-                console.log('Archivo subido correctamente');
-                
-                const { data: publicUrlData } = supabaseClient.storage
-                    .from('archivos')
-                    .getPublicUrl(archivoNombre);
-                
-                datos.archivo_url = publicUrlData.publicUrl;
-                console.log('URL pública:', datos.archivo_url);
-            }
-            
-            const { error } = await supabaseClient
-                .from('documento_carreta')
-                .update(datos)
-                .eq('id_documento', idDocumentoEdit);
-            
-            if (error) {
-                alert('Error: ' + error.message);
-                return;
-            }
-            
-            alert('Documento actualizado correctamente!');
-            window.location.href = 'Vista_Carreta_Doc.html';
+            );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message
+            );
         }
-        
+
+        alert(
+            'Documento actualizado correctamente'
+        );
+
+        window.location.href =
+            'Vista_Carreta_Doc.html';
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message
+        );
+    }
+}
         document.getElementById('formularioDocumento').addEventListener('submit', guardarDocumento);
         
         document.getElementById('btnCancelar').addEventListener('click', () => {
