@@ -100,59 +100,111 @@
         let carretasData = [];
 
         // Cargar carretas para el filtro
-        async function cargarCarretas() {
-            const response = await fetch('/api/carretas');
+     async function cargarCarretas() {
 
-            const data = await response.json();
+    try {
 
-            if (!response.ok) {
-                throw new Error(data.message);
-            }
+        const response =
+            await fetch(
+                '/api/carretas'
+            );
 
-            carretasData = data;
+        const data =
+            await response.json();
 
-            const filtroCarreta = document.getElementById('filtroCarreta');
+        if (!response.ok) {
 
-            data.forEach(carreta => {
-                const option = document.createElement('option');
-                option.value = carreta.id_carreta;
-                option.textContent = `${carreta.placa} - ${carreta.tipo || ''}`.trim();
-                filtroCarreta.appendChild(option);
-            });
+            throw new Error(
+                data.message
+            );
         }
 
+        carretasData =
+            data;
+
+        const filtroCarreta =
+            document.getElementById(
+                'filtroCarreta'
+            );
+
+        filtroCarreta.innerHTML =
+            '<option value="">Todos los carretas</option>';
+
+        data.forEach(carreta => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+            option.value =
+                carreta.id_carreta;
+
+            option.textContent =
+                `${carreta.placa} - ${carreta.tipo || ''}`.trim();
+
+            filtroCarreta.appendChild(
+                option
+            );
+        });
+
+    } catch (error) {
+
+        console.error(
+            'Error al cargar carretas:',
+            error
+        );
+    }
+}
+
         async function cargarDocumentos() {
-            const tbody = document.getElementById('tablaCarretaDoc');
 
-            // JOIN con carreta y tipo_documento
-            const { data, error } = await supabaseClient
-                .from('documento_carreta')
-                .select(`
-                    id_documento,
-                    id_carreta,
-                    id_tipo_documento,
-                    archivo_url,
-                    fecha_emision,
-                    fecha_vencimiento,
-                    estado,
-                    observacion,
-                    carreta: id_carreta (placa, tipo),
-                    tipo_documento: id_tipo_documento (nombre)`)
-                .order('id_documento', { ascending: false });
+            const tbody =
+                document.getElementById(
+                    'tablaCarretaDoc'
+                );
 
-            if (error) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: red;">Error: ' + error.message + '</td></tr>';
-                return;
+            try {
+
+                const response =
+                    await fetch(
+                        '/api/documentos-carreta'
+                    );
+
+                const data =
+                    await response.json();
+
+                todosLosDocumentos =
+                    data;
+
+                if (data.length === 0) {
+
+                    tbody.innerHTML =
+                        '<tr><td colspan="9">No hay documentos registrados</td></tr>';
+
+                    return;
+                }
+
+                mostrarDocumentos(
+                    data
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                tbody.innerHTML =
+                    `<tr>
+                <td colspan="9"
+                    style="
+                        text-align:center;
+                        color:red;
+                        padding:40px;
+                    ">
+                    Error: ${error.message}
+                </td>
+            </tr>`;
             }
-
-            todosLosDocumentos = data;
-
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9">No hay documentos registrados</td></tr>';
-                return;
-            }
-
-            mostrarDocumentos(data);
         }
 
         // FUNCION para calcular estado de vencimiento estara activo o no y mostrarlo con un color diferente segun el caso
