@@ -3043,6 +3043,70 @@ app.put(
         }
     }
 );
+app.post(
+    '/api/proveedores',
+    async (req, res) => {
+
+        try {
+
+            const {
+                ruc,
+                nombre,
+                telefono,
+                correo,
+                direccion,
+                observaciones,
+                estado
+            } = req.body;
+
+            const result =
+                await pool.query(
+                    `
+                    INSERT INTO proveedor
+                    (
+                        ruc,
+                        nombre,
+                        telefono,
+                        correo,
+                        direccion,
+                        observaciones,
+                        estado
+                    )
+                    VALUES
+                    (
+                        $1,$2,$3,$4,$5,$6,$7
+                    )
+                    RETURNING *
+                    `,
+                    [
+                        ruc,
+                        nombre,
+                        telefono || null,
+                        correo || null,
+                        direccion || null,
+                        observaciones || null,
+                        estado
+                    ]
+                );
+
+            res.json({
+                success: true,
+                proveedor:
+                    result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================
