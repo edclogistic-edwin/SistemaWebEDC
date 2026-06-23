@@ -73,6 +73,40 @@ const uploadDocumentosTracto =
     multer({
         storage: storageDocumentosTracto
     });
+
+
+
+// ==========================
+// DOCUMENTOS carretera
+// ==========================
+
+const storageDocumentosCarreta =
+    multer.diskStorage({
+
+        destination:
+            (req, file, cb) => {
+
+                cb(
+                    null,
+                    'uploads/documentos_carreta'
+                );
+            },
+
+        filename:
+            (req, file, cb) => {
+
+                cb(
+                    null,
+                    `carreta_${Date.now()}_${file.originalname}`
+                );
+            }
+    });
+
+const uploadDocumentosCarreta =
+    multer({
+        storage:
+            storageDocumentosCarreta
+    });
 // ==========================
 // SUBIDA FOTO TRACTO
 // ==========================
@@ -2328,6 +2362,97 @@ app.put(
             </tr>`;
     }
 }
+app.post(
+    '/api/documentos-carreta',
+    uploadDocumentosCarreta.single(
+        'archivo'
+    ),
+    async (req, res) => {
+
+        try {
+
+            const {
+                id_carreta,
+                id_tipo_documento,
+                fecha_emision,
+                fecha_vencimiento,
+                observacion
+            } = req.body;
+
+            let archivoUrl =
+                null;
+
+            if (req.file) {
+
+                archivoUrl =
+                    `${BASE_URL}/uploads/documentos_carreta/${req.file.filename}`;
+            }
+
+            const result =
+                await pool.query(
+                    `
+                    INSERT INTO documento_carreta
+                    (
+                        id_carreta,
+                        id_tipo_documento,
+                        archivo_url,
+                        fecha_emision,
+                        fecha_vencimiento,
+                        observacion,
+                        estado
+                    )
+                    VALUES
+                    (
+                        $1,$2,$3,$4,$5,$6,true
+                    )
+                    RETURNING *
+                    `,
+                    [
+                        id_carreta,
+                        id_tipo_documento,
+                        archivoUrl,
+                        fecha_emision,
+                        fecha_vencimiento || null,
+                        observacion || null
+                    ]
+                );
+
+            res.json({
+                success: true,
+                documento:
+                    result.rows[0]
+            });
+
+        } catch (error) {
+
+            console.error(error);
+
+            res.status(500).json({
+                success: false,
+                message:
+                    error.message
+            });
+        }
+    }
+);
+app.get(
+    '/api/tipos-documento/carreta',
+    async (req, res) => {
+
+        const result =
+            await pool.query(`
+                SELECT *
+                FROM tipo_documento
+                WHERE estado = true
+                AND categoria = 'carreta'
+                ORDER BY nombre
+            `);
+
+        res.json(
+            result.rows
+        );
+    }
+);
 // ====================================
 // INICIAR SERVIDOR
 // ====================================
