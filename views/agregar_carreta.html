@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,245 +87,245 @@
 
     <script>
 
-const form =
-    document.getElementById(
-        'formAgregarCarreta'
-    );
-
-const mensaje =
-    document.getElementById(
-        'mensaje'
-    );
-
-const idTractoSelect =
-    document.getElementById(
-        'id_tracto'
-    );
-
-const tractoLoading =
-    document.getElementById(
-        'tractoLoading'
-    );
-
-// ==========================
-// CARGAR TRACTOS
-// ==========================
-async function cargarTractos() {
-
-    try {
-
-        const response =
-            await fetch(
-                '/api/tractos-activos'
+        const form =
+            document.getElementById(
+                'formAgregarCarreta'
             );
 
-        const data =
-            await response.json();
+        const mensaje =
+            document.getElementById(
+                'mensaje'
+            );
 
-        tractoLoading.style.display =
-            'none';
+        const idTractoSelect =
+            document.getElementById(
+                'id_tracto'
+            );
 
-        if (data.length === 0) {
+        const tractoLoading =
+            document.getElementById(
+                'tractoLoading'
+            );
 
-            idTractoSelect.innerHTML =
-                '<option value="">No hay tractos disponibles</option>';
+        // ==========================
+        // CARGAR TRACTOS PARA UNA OPTIMA CONVERSION
+        // ==========================
+        async function cargarTractos() {
 
-            return;
-        }
+            try {
 
-        data.forEach(
-            tracto => {
-
-                const option =
-                    document.createElement(
-                        'option'
+                const response =
+                    await fetch(
+                        '/api/tractos-activos'
                     );
 
-                option.value =
-                    tracto.id_tracto;
+                const data =
+                    await response.json();
 
-                option.textContent =
-                    `${tracto.placa} - ${tracto.marca || 'Sin marca'} (Año: ${tracto.anio || 'Sin año'})`;
+                tractoLoading.style.display =
+                    'none';
 
-                idTractoSelect.appendChild(
-                    option
-                );
-            }
-        );
+                if (data.length === 0) {
 
-    } catch (err) {
+                    idTractoSelect.innerHTML =
+                        '<option value="">No hay tractos disponibles</option>';
 
-        mostrarMensaje(
-            err.message,
-            'error'
-        );
+                    return;
+                }
 
-        tractoLoading.style.display =
-            'none';
-    }
-}
+                data.forEach(
+                    tracto => {
 
-// ==========================
-// GUARDAR CARRETA
-// ==========================
-form.addEventListener(
-    'submit',
-    async (e) => {
+                        const option =
+                            document.createElement(
+                                'option'
+                            );
 
-        e.preventDefault();
+                        option.value =
+                            tracto.id_tracto;
 
-        mensaje.style.display =
-            'none';
+                        option.textContent =
+                            `${tracto.placa} - ${tracto.marca || 'Sin marca'} (Año: ${tracto.anio || 'Sin año'})`;
 
-        const submitBtn =
-            form.querySelector(
-                'button[type="submit"]'
-            );
-
-        submitBtn.disabled =
-            true;
-
-        submitBtn.textContent =
-            'Guardando...';
-
-        try {
-
-            const response =
-                await fetch(
-                    '/api/carretas',
-                    {
-                        method: 'POST',
-
-                        headers: {
-                            'Content-Type':
-                                'application/json'
-                        },
-
-                        body:
-                            JSON.stringify({
-                                placa:
-                                    document.getElementById(
-                                        'placa'
-                                    ).value,
-
-                                tipo:
-                                    document.getElementById(
-                                        'tipo'
-                                    ).value || null,
-
-                                id_tracto:
-                                    document.getElementById(
-                                        'id_tracto'
-                                    ).value || null
-                            })
+                        idTractoSelect.appendChild(
+                            option
+                        );
                     }
                 );
 
-            const data =
-                await response.json();
+            } catch (err) {
 
-            if (!response.ok) {
-
-                throw new Error(
-                    data.message
+                mostrarMensaje(
+                    err.message,
+                    'error'
                 );
+
+                tractoLoading.style.display =
+                    'none';
             }
-
-            mostrarMensaje(
-                'Carreta guardada correctamente',
-                'success'
-            );
-
-            setTimeout(
-                () => {
-
-                    window.location.href =
-                        'Vista_Carreta.html';
-
-                },
-                1500
-            );
-
-        } catch (err) {
-
-            mostrarMensaje(
-                err.message,
-                'error'
-            );
-
-            submitBtn.disabled =
-                false;
-
-            submitBtn.textContent =
-                'Guardar Carreta';
         }
-    }
-);
 
-// ==========================
-// MENSAJES
-// ==========================
-function mostrarMensaje(
-    texto,
-    tipo
-) {
+        // ==========================
+        // GUARDAR CARRETA
+        // ==========================
+        form.addEventListener(
+            'submit',
+            async (e) => {
 
-    mensaje.textContent =
-        texto;
+                e.preventDefault();
 
-    mensaje.style.display =
-        'block';
+                mensaje.style.display =
+                    'none';
 
-    mensaje.className =
-        tipo === 'error'
-            ? 'error'
-            : 'success';
+                const submitBtn =
+                    form.querySelector(
+                        'button[type="submit"]'
+                    );
 
-    mensaje.style.background =
-        tipo === 'error'
-            ? '#fee2e2'
-            : '#d1fae5';
+                submitBtn.disabled =
+                    true;
 
-    mensaje.style.color =
-        tipo === 'error'
-            ? '#dc2626'
-            : '#059669';
-}
+                submitBtn.textContent =
+                    'Guardando...';
 
-// ==========================
-// INICIO
-// ==========================
-cargarTractos();
+                try {
 
-document.getElementById(
-    'logoutBtn'
-).addEventListener(
-    'click',
-    (e) => {
+                    const response =
+                        await fetch(
+                            '/api/carretas',
+                            {
+                                method: 'POST',
 
-        e.preventDefault();
+                                headers: {
+                                    'Content-Type':
+                                        'application/json'
+                                },
 
-        localStorage.clear();
+                                body:
+                                    JSON.stringify({
+                                        placa:
+                                            document.getElementById(
+                                                'placa'
+                                            ).value,
 
-        window.location.href =
-            '../index.html';
-    }
-);
+                                        tipo:
+                                            document.getElementById(
+                                                'tipo'
+                                            ).value || null,
 
-document.getElementById(
-    'perfilBtn'
-).addEventListener(
-    'click',
-    (e) => {
+                                        id_tracto:
+                                            document.getElementById(
+                                                'id_tracto'
+                                            ).value || null
+                                    })
+                            }
+                        );
 
-        e.preventDefault();
+                    const data =
+                        await response.json();
 
-        window.location.href =
-            'Vista_Perfil.html';
-    }
-);
+                    if (!response.ok) {
 
-</script>
+                        throw new Error(
+                            data.message
+                        );
+                    }
+
+                    mostrarMensaje(
+                        'Carreta guardada correctamente',
+                        'success'
+                    );
+
+                    setTimeout(
+                        () => {
+
+                            window.location.href =
+                                'Vista_Carreta.html';
+
+                        },
+                        1500
+                    );
+
+                } catch (err) {
+
+                    mostrarMensaje(
+                        err.message,
+                        'error'
+                    );
+
+                    submitBtn.disabled =
+                        false;
+
+                    submitBtn.textContent =
+                        'Guardar Carreta';
+                }
+            }
+        );
+
+        // ==========================
+        // MENSAJES
+        // ==========================
+        function mostrarMensaje(
+            texto,
+            tipo
+        ) {
+
+            mensaje.textContent =
+                texto;
+
+            mensaje.style.display =
+                'block';
+
+            mensaje.className =
+                tipo === 'error'
+                    ? 'error'
+                    : 'success';
+
+            mensaje.style.background =
+                tipo === 'error'
+                    ? '#fee2e2'
+                    : '#d1fae5';
+
+            mensaje.style.color =
+                tipo === 'error'
+                    ? '#dc2626'
+                    : '#059669';
+        }
+
+        // ==========================
+        // INICIO
+        // ==========================
+        cargarTractos();
+
+        document.getElementById(
+            'logoutBtn'
+        ).addEventListener(
+            'click',
+            (e) => {
+
+                e.preventDefault();
+
+                localStorage.clear();
+
+                window.location.href =
+                    '../index.html';
+            }
+        );
+
+        document.getElementById(
+            'perfilBtn'
+        ).addEventListener(
+            'click',
+            (e) => {
+
+                e.preventDefault();
+
+                window.location.href =
+                    'Vista_Perfil.html';
+            }
+        );
+
+    </script>
 </body>
 
 </html>
